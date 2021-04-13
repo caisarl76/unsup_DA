@@ -48,6 +48,8 @@ def parse_args(args=None, namespace=None):
     parser.add_argument('--save-root', help='directory to save models', default=None, type=str)
     parser.add_argument('--save-dir', help='directory to save models', default='result/try1', type=str)
     parser.add_argument('--ssl', help='stage 1 selfsup learning', action='store_true')
+    parser.add_argument('--byol', help='load byol weights on stage 1', action='store_true')
+    parser.add_argument('--byol-path', help='byol weights path', type=str, default='byol/byol_r50_bs256_accmulate16_ep300-5df46722.pth')
     parser.add_argument('--model-path', help='directory to save models', default='result/try1/best_model.ckpt',
                         type=str)
     parser.add_argument('--model-name', help='model name', default='resnet50dsbn')
@@ -185,6 +187,34 @@ def train(args, model, train_dataset, val_dataset, stage, save_dir, domain_num):
 
     return
 
+def load_byol_weight(model, byol_path):
+    bn_list = ['bns.0', 'bns.1', 'bns.2', 'bns.3']
+    byol_weight = torch.load(byol_path)['state_dict']
+    new_dict = OrderedDict()
+
+    for name in byol_weight:
+        split = name.split('.')
+
+        if ('bn' in name):
+
+            for bn in bn_list:
+                new_split = name.split('.')
+                new_split.insert(-1, bn)
+                new_name = '.'.join(new_split)
+                print(new_name)
+                new_dict[new_name] = byol_weight[name]
+        elif ('downsample.1' in name):
+            for bn in bn_list:
+                new_split = name.split('.')
+                new_split.insert(-1, bn)
+                new_name = '.'.join(new_split)
+                print(new_name)
+                new_dict[new_name] = byol_weight[name]
+        #         print(name)
+        else:
+            new_dict[name] = byol_weight[name]
+
+    model.load_state_dict(new_dict, strict=False)
 
 def main():
     args = parse_args()
@@ -206,6 +236,10 @@ def main():
 
         if(args.ssl):
             model = get_rot_model(args.model_name, num_domains=4)
+            if (args.byol):
+
+                model = load_byol_weight(model, byol_path=args.byol_path)
+
             train_dataset = rot_dataset(args.data_root, 1, [args.trg_domain], 'train')
             val_dataset = rot_dataset(args.data_root, 1, [args.trg_domain], 'val')
         else:
