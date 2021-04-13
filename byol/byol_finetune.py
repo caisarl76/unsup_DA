@@ -34,7 +34,7 @@ def parse_args(args=None, namespace=None):
     parser.add_argument("--gpu", type=int, default=0, help="choose gpu device.")
     parser.add_argument('--num-workers', help='number of worker to load data', default=5, type=int)
     parser.add_argument('--batch-size', help='batch_size', default=40, type=int)
-    parser.add_argument("--iter", type=int, default=550, help="iterations.")
+    parser.add_argument("--iter", type=int, default=10000, help="iterations.")
 
     parser.add_argument('--learning-rate', '-lr', dest='learning_rate', help='learning_rate', default=1e-3, type=float)
     parser.add_argument('--weight-decay', help='weight decay', default=0.0, type=float)
