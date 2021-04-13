@@ -83,7 +83,7 @@ class DomainSpecificBatchNorm2d(_DomainSpecificBatchNorm):
 
 class AlexnetDSBN(nn.Module):
 
-    def __init__(self, classes=1000, in_features=0, num_domains=2, mmd=False):
+    def __init__(self, classes=1000, in_features=0, num_domains=4, mmd=False):
         self.inplanes = 64
         self.in_features = in_features
         self.num_domains = num_domains
@@ -152,7 +152,7 @@ class AlexnetDSBN(nn.Module):
 
 
 class LRNBlock(nn.Module):
-    def __init__(self, inplanes, planes, kernel_size_1=11, kernel_size_2=3, padding=0, groups=2, num_domains=2,
+    def __init__(self, inplanes, planes, kernel_size_1=11, kernel_size_2=3, padding=0, groups=2, num_domains=4,
                  first=True):
         super(LRNBlock, self).__init__()
         self.first = first
@@ -175,7 +175,7 @@ class LRNBlock(nn.Module):
 
 
 class BasicBlock(nn.Module):
-    def __init__(self, inplanes, planes, num_domains=2, first=False, last=False):
+    def __init__(self, inplanes, planes, num_domains=4, first=False, last=False):
         super(BasicBlock, self).__init__()
         self.first = first
         self.last = last

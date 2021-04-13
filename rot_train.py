@@ -83,8 +83,6 @@ def train(args, model, train_dataset, val_dataset, stage, save_dir):
     params = get_optimizer_params(model, args.learning_rate, weight_decay=args.weight_decay,
                                   double_bias_lr=True, base_weight_factor=0.1)
     optimizer = optim.Adam(params, betas=(0.9, 0.999))
-    # for name, p in model.named_parameters():
-    #     print(name, p.requires_grad)
     ce_loss = nn.CrossEntropyLoss()
     writer = SummaryWriter()
     if(len(train_dataset.classes)==4):

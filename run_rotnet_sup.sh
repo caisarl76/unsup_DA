@@ -1,20 +1,16 @@
 #!/bin/bash
 
 
-# CUDA_VISIBLE_DEIVCES=0 python new_train.py --save-dir rot_sup_resnet/r_a --src-domain RealWorld --trg-domain Art
- 
-# CUDA_VISIBLE_DEIVCES=0 python new_train.py --save-dir rot_sup_resnet/r_p --src-domain RealWorld --trg-domain Product
+CUDA_VISIBLE_DEVICES=0 python four_domain_train_on_rot.py --trg-domain Clipart --src-domain RealWorld --save-dir rot_sup/resnet50/r_c
+CUDA_VISIBLE_DEVICES=0 python four_domain_train_on_rot.py --trg-domain Art --src-domain RealWorld --save-dir rot_sup/resnet50/r_a
+CUDA_VISIBLE_DEVICES=0 python four_domain_train_on_rot.py --trg-domain Product --src-domain RealWorld --save-dir rot_sup/resnet50/r_p
+CUDA_VISIBLE_DEVICES=0 python four_domain_train_on_rot.py --src-domain Clipart --trg-domain RealWorld --save-dir rot_sup/resnet50/c_r
+CUDA_VISIBLE_DEVICES=0 python four_domain_train_on_rot.py --src-domain Clipart --trg-domain Art --save-dir rot_sup/resnet50/c_a
+CUDA_VISIBLE_DEVICES=0 python four_domain_train_on_rot.py --src-domain Clipart --trg-domain Product --save-dir rot_sup/resnet50/c_p
+CUDA_VISIBLE_DEVICES=0 python four_domain_train_on_rot.py --src-domain Art --trg-domain Clipart --save-dir rot_sup/resnet50/a_c
+CUDA_VISIBLE_DEVICES=0 python four_domain_train_on_rot.py --src-domain Art --trg-domain RealWorld --save-dir rot_sup/resnet50/a_r
+CUDA_VISIBLE_DEVICES=0 python four_domain_train_on_rot.py --src-domain Art --trg-domain Product --save-dir rot_sup/resnet50/a_p
+CUDA_VISIBLE_DEVICES=0 python four_domain_train_on_rot.py --src-domain Product --trg-domain Art --save-dir rot_sup/resnet50/p_a
+CUDA_VISIBLE_DEVICES=0 python four_domain_train_on_rot.py --src-domain Product --trg-domain Clipart --save-dir rot_sup/resnet50/p_c
+CUDA_VISIBLE_DEVICES=0 python four_domain_train_on_rot.py --src-domain Product --trg-domain RealWorld --save-dir rot_sup/resnet50/p_r
 
-# CUDA_VISIBLE_DEIVCES=0 python new_train.py --save-dir rot_sup_resnet/a_r --src-domain Art --trg-domain RealWorld
-
-# CUDA_VISIBLE_DEIVCES=0 python new_train.py --save-dir rot_sup_resnet/p_r --src-domain Product --trg-domain RealWorld
-
-
-CUDA_VISIBLE_DEIVCES=0 python new_train.py --save-dir rot_sup_resnet/c_a --src-domain Clipart --trg-domain Art
-CUDA_VISIBLE_DEIVCES=0 python new_train.py --save-dir rot_sup_resnet/c_p --src-domain Clipart --trg-domain Product
-
-CUDA_VISIBLE_DEIVCES=0 python new_train.py --save-dir rot_sup_resnet/a_c --src-domain Art --trg-domain Clipart
-CUDA_VISIBLE_DEIVCES=0 python new_train.py --save-dir rot_sup_resnet/a_p --src-domain Art --trg-domain Product
-
-CUDA_VISIBLE_DEIVCES=0 python new_train.py --save-dir rot_sup_resnet/p_a --src-domain Product --trg-domain Art
-CUDA_VISIBLE_DEIVCES=0 python new_train.py --save-dir rot_sup_resnet/p_c --src-domain Product --trg-domain Clipart

@@ -40,7 +40,8 @@ val_transform = transforms.Compose([
     transforms.Normalize(mean=[0.485, 0.456, 0.406],
                          std=[0.229, 0.224, 0.225])
 ])
-domain_dict = {'RealWorld': 1, 'Clipart': 0, 'Product': 0, 'Art': 0}
+
+domain_dict = {'RealWorld': 0, 'Art': 1, 'Clipart': 2, 'Product': 3}
 transform = {'train': train_transform, 'val': val_transform, 'test': val_transform}
 
 

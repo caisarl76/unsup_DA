@@ -346,7 +346,7 @@ def get_rot_model(model_name, num_domains=2):
     elif(model_name == 'resnet34dsbn'):
         model = resnet34dsbn(pretrained=True, num_domains=num_domains)
     elif (model_name == 'resnet50dsbn'):
-        model = resnet34dsbn(pretrained=True, num_domains=num_domains)
+        model = resnet50dsbn(pretrained=True, num_domains=num_domains)
     else:
         print('wrong model')
         return -1

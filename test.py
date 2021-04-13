@@ -18,6 +18,7 @@ from utils.train_utils import LRScheduler, Monitor
 from utils import io_utils, eval_utils
 
 domain_dict = {'RealWorld': 1, 'Clipart': 0, 'Product': 0, 'Art':0}
+domain_dict = {'RealWorld': 0, 'Art': 1, 'Clipart': 2, 'Product': 3}
 # save_root = '/media/hd/jihun/dsbn_result/results/dsbn_ori/'
 save_root = '/media/hd/jihun/dsbn_result/new/'
 # save_root = '.'
@@ -83,7 +84,7 @@ def main():
     print(args.ssl)
 
 
-    model = get_model(args.model_name, 65, 65, 2, pretrained=True)
+    model = get_model(args.model_name, 65, 65, 4, pretrained=True)
 
     if (args.ssl == 1):
         pre = torch.load(join(save_root, args.model_path))['model']

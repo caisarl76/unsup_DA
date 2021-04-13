@@ -19,8 +19,8 @@ from Utils.TrainingUtils import adjust_learning_rate, compute_accuracy
 from Dataset.data_loader import DataLoader
 
 save_root = '/media/hd/jihun/dsbn_result/new/'
-domain_dict = {'RealWorld': 1, 'Clipart': 0, 'Product': 0, 'Art': 0}
 
+domain_dict = {'RealWorld': 0, 'Art': 1, 'Clipart': 2, 'Product': 3}
 
 def parse_args(args=None, namespace=None):
     parser = argparse.ArgumentParser(description='Train jigsaw puzzle archi with sup task')
@@ -239,6 +239,9 @@ def train(args, model, train_data, val_data, save_dir, domain_num):
 def main():
     args = parse_args()
 
+    trg_num = domain_dict[args.trg_domain]
+    src_num = domain_dict[args.src_domain]
+
     if args.gpu is not None:
         print(('Using GPU %d' % args.gpu))
         os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
@@ -263,9 +266,8 @@ def main():
         train_data = DataLoader(trainpath, split='train', classes=args.classes[stage - 1], ssl=True)
         valpath = join(args.data_path, args.trg_domain)
         val_data = DataLoader(valpath, split='train', classes=args.classes[stage - 1], ssl=True)
-        domain_num = domain_dict[args.trg_domain]
         ssl_train(args=args, model=model, train_data=train_data, val_data=val_data, save_dir=save_dir,
-                  domain_num=domain_num)
+                  domain_num=trg_num)
 
         if (args.proceed):
             stage += 1
@@ -292,13 +294,17 @@ def main():
 
         model.load_state_dict(new_pre, strict=False)
 
+        bn_name = 'bns.' + (str)(src_num)
         for name, p in model.named_parameters():
-            if ('bns.1' in name) or('fc' in name):
+            if ('fc' in name) or(bn_name in name):
                 p.requires_grad = True
-                print(name)
+                # print(name)
                 continue
             else:
                 p.requires_grad = False
+        return
+
+
         torch.nn.init.xavier_uniform_(model.fc6.fc6_s1.weight)
         torch.nn.init.xavier_uniform_(model.fc7.fc7.weight)
         torch.nn.init.xavier_uniform_(model.classifier.fc8.weight)
