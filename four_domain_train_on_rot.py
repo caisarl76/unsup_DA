@@ -45,6 +45,7 @@ def parse_args(args=None, namespace=None):
     parser = argparse.ArgumentParser()
     parser.add_argument('--data-root', type=str, help='Path to dataset folder',
                         default='/data/jihun/OfficeHomeDataset_10072016/')
+    parser.add_argument('--save-root', help='directory to save models', default=None, type=str)
     parser.add_argument('--save-dir', help='directory to save models', default='result/try1', type=str)
     parser.add_argument('--ssl', help='stage 1 selfsup learning', action='store_true')
     parser.add_argument('--model-path', help='directory to save models', default='result/try1/best_model.ckpt',
@@ -187,6 +188,10 @@ def train(args, model, train_dataset, val_dataset, stage, save_dir, domain_num):
 
 def main():
     args = parse_args()
+    if(args.save_root):
+        save_root = args.save_root
+        print('save root: ', save_root)
+
     stage = args.stage
     torch.cuda.set_device(args.gpu)
 
