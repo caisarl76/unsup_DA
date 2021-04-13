@@ -193,28 +193,24 @@ def load_byol_weight(model, byol_path):
     new_dict = OrderedDict()
 
     for name in byol_weight:
-        split = name.split('.')
-
         if ('bn' in name):
-
             for bn in bn_list:
                 new_split = name.split('.')
                 new_split.insert(-1, bn)
                 new_name = '.'.join(new_split)
-                print(new_name)
                 new_dict[new_name] = byol_weight[name]
         elif ('downsample.1' in name):
             for bn in bn_list:
                 new_split = name.split('.')
                 new_split.insert(-1, bn)
                 new_name = '.'.join(new_split)
-                print(new_name)
                 new_dict[new_name] = byol_weight[name]
         #         print(name)
         else:
             new_dict[name] = byol_weight[name]
 
     model.load_state_dict(new_dict, strict=False)
+    return model
 
 def main():
     args = parse_args()
