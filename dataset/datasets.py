@@ -16,6 +16,23 @@ import zipfile
 import h5py
 import functools
 
+office_train_transform = transforms.Compose([
+    transforms.Resize(256),
+    transforms.RandomResizedCrop(224),
+    transforms.RandomHorizontalFlip(),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                         std=[0.229, 0.224, 0.225])
+])
+
+office_val_transform = transforms.Compose([
+    transforms.Resize(256),
+    transforms.CenterCrop(224),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                         std=[0.229, 0.224, 0.225])
+])
+
 
 class MNIST_rotate(data.Dataset):
     urls = [
@@ -614,7 +631,7 @@ class OFFICEHOME_multi(data.Dataset):
         samples (list): List of (sample path, class_index) tuples
     """
 
-    def __init__(self, root, num_domain, domain, list_file=None, transform=None, target_transform=None):
+    def __init__(self, root, num_domain, domain, list_file=None, split='train', target_transform=None):
 
         self.extensions = ['jpg', 'jpeg', 'png']
         domain_root_dir = []
@@ -642,8 +659,10 @@ class OFFICEHOME_multi(data.Dataset):
         self.classes = classes
         self.class_to_idx = class_to_idx
         self.samples = samples
-
-        self.transform = transform
+        if(split=='train'):
+            self.transform = office_train_transform
+        else:
+            self.transform = office_val_transform
         self.target_transform = target_transform
 
     def __getitem__(self, index):

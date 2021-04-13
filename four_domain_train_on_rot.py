@@ -23,24 +23,6 @@ save_root = '/media/hd/jihun/dsbn_result/new/'
 
 domain_dict = {'RealWorld': 0, 'Art': 1, 'Clipart': 2, 'Product': 3}
 
-train_transform = transforms.Compose([
-    transforms.Resize(256),
-    transforms.RandomResizedCrop(224),
-    transforms.RandomHorizontalFlip(),
-    transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                         std=[0.229, 0.224, 0.225])
-])
-
-val_transform = transforms.Compose([
-    transforms.Resize(256),
-    transforms.CenterCrop(224),
-    transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                         std=[0.229, 0.224, 0.225])
-])
-
-
 def parse_args(args=None, namespace=None):
     parser = argparse.ArgumentParser()
     parser.add_argument('--data-root', type=str, help='Path to dataset folder',
@@ -85,7 +67,7 @@ def train(args, model, train_dataset, val_dataset, stage, save_dir, domain_num):
     optimizer = optim.Adam(params, betas=(0.9, 0.999))
     ce_loss = nn.CrossEntropyLoss()
 
-    writer = SummaryWriter()
+    writer = SummaryWriter(log_dir=join(save_dir, 'logs'))
     print('domain_num, stage: ', domain_num, stage)
     global best_accuracy
     global best_accuracies_each_c
@@ -187,6 +169,7 @@ def train(args, model, train_dataset, val_dataset, stage, save_dir, domain_num):
 
     return
 
+
 def load_byol_weight(model, byol_path):
     bn_list = ['bns.0', 'bns.1', 'bns.2', 'bns.3']
     byol_weight = torch.load(byol_path)['state_dict']
@@ -233,7 +216,6 @@ def main():
         if(args.ssl):
             model = get_rot_model(args.model_name, num_domains=4)
             if (args.byol):
-
                 model = load_byol_weight(model, byol_path=args.byol_path)
 
             train_dataset = rot_dataset(args.data_root, 1, [args.trg_domain], 'train')
@@ -241,8 +223,8 @@ def main():
         else:
 
             model = get_model(args.model_name, 65, 65, 4, pretrained=True)
-            train_dataset = OFFICEHOME_multi(args.data_root, 1, [args.trg_domain], transform=train_transform)
-            val_dataset = OFFICEHOME_multi(args.data_root, 1, [args.trg_domain], transform=val_transform)
+            train_dataset = OFFICEHOME_multi(args.data_root, 1, [args.trg_domain], split='train')
+            val_dataset = OFFICEHOME_multi(args.data_root, 1, [args.trg_domain], split='val')
 
         train(args, model, train_dataset, val_dataset, stage, save_dir, trg_num)
 
@@ -280,13 +262,13 @@ def main():
                 p.requires_grad = False
         torch.nn.init.xavier_uniform_(model.fc1.weight)
         torch.nn.init.xavier_uniform_(model.fc2.weight)
-        train_dataset = OFFICEHOME_multi(args.data_root, 1, [args.src_domain], transform=train_transform)
-        val_dataset = OFFICEHOME_multi(args.data_root, 1, [args.src_domain], transform=val_transform)
+        train_dataset = OFFICEHOME_multi(args.data_root, 1, [args.src_domain], split='train')
+        val_dataset = OFFICEHOME_multi(args.data_root, 1, [args.src_domain], split='val')
 
         train(args, model, train_dataset, val_dataset, stage, save_dir, src_num)
 
         if (args.proceed):
-            val_dataset = OFFICEHOME_multi(args.data_root, 1, [args.trg_domain], transform=val_transform)
+            val_dataset = OFFICEHOME_multi(args.data_root, 1, [args.trg_domain], split='val')
             val_dataloader = util_data.DataLoader(val_dataset, batch_size=args.batch_size, shuffle=True,
                                                   num_workers=args.num_workers, drop_last=True, pin_memory=True)
             val_dataloader_iter = enumerate(val_dataloader)
