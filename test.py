@@ -77,7 +77,7 @@ def main():
     # print('domain num:', domain_num)
     # print(args.ssl)
 
-    model = get_model(args.model_name, 65, 65, 4, pretrained=True)
+    model = get_model(args.model_name, 65, 65, 4, pretrained=False)
 
     if (args.ssl == 1):
         pre = torch.load(join(save_root, args.model_path))['model']
