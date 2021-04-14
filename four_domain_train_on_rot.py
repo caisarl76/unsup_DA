@@ -199,7 +199,7 @@ def main():
     args = parse_args()
     if(args.save_root):
         save_root = args.save_root
-        print('save root: ', save_root)
+
 
     stage = args.stage
     torch.cuda.set_device(args.gpu)
@@ -209,6 +209,7 @@ def main():
 
     if (stage == 1):
         save_dir = join(save_root, args.save_dir, 'stage1')
+        print('save dir: ', save_dir)
         if not os.path.isdir(save_dir):
             os.makedirs(save_dir, exist_ok=True)
         print('domain: ', args.trg_domain)
