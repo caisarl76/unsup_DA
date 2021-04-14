@@ -41,7 +41,7 @@ def parse_args(args=None, namespace=None):
 
     parser.add_argument('--num-workers', help='number of worker to load data', default=5, type=int)
     parser.add_argument('--batch-size', help='batch_size', default=40, type=int)
-    parser.add_argument("--iters", type=int, default=[550, 550], help="choose gpu device.", nargs='+')
+    parser.add_argument("--iters", type=int, default=[40050, 15001], help="choose gpu device.", nargs='+')
     parser.add_argument("--gpu", type=int, default=0, help="choose gpu device.")
 
     parser.add_argument('--learning-rate', '-lr', dest='learning_rate', help='learning_rate', default=1e-3, type=float)
@@ -175,6 +175,7 @@ def finetune(args, save_dir, domain_num, iters):
             model.train(True)
             model = model.cuda(args.gpu)
 
+
 def train(args, model, train_dataset, val_dataset, save_dir, domain_num):
     train_dataloader = util_data.DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True,
                                             num_workers=args.num_workers, drop_last=True, pin_memory=True)
@@ -276,8 +277,7 @@ def train(args, model, train_dataset, val_dataset, save_dir, domain_num):
                 # save best checkpoint
                 io_utils.save_check(save_dir, i, model_dict, optimizer_dict, best=True)
 
-
-        if (i % 500 == 0 and i != 0):
+        if (i % 10000 == 0 and i != 0):
             print('%d th it rotation accuracy: %0.3f ' % (i, val_accuracy))
             model_dict = {'model': model.cpu().state_dict()}
             optimizer_dict = {'optimizer': optimizer.state_dict()}
@@ -291,7 +291,6 @@ def train(args, model, train_dataset, val_dataset, save_dir, domain_num):
     writer.flush()
     writer.close()
 
-    return
 
 
 def main():
