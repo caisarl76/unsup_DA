@@ -236,7 +236,7 @@ def main():
         if not os.path.isdir(save_dir):
             os.makedirs(save_dir, exist_ok=True)
         print('domain: ', args.src_domain)
-        model = get_model(args.model_name, 65, 65, 4, pretrained=True)
+        model = get_model(args.model_name, 65, 65, 4, pretrained=False)
         if (args.proceed):
             if(args.ssl):
                 pre = torch.load(join(save_root, args.save_dir, 'stage1', 'best_model.ckpt'))['model']
