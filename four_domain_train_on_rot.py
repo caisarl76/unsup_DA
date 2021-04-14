@@ -248,7 +248,6 @@ def main():
                         new_pre[p] = pre[p]
                 model.load_state_dict(new_pre, strict=False)
                 del new_pre
-
             else:
                 model.load_state_dict(torch.load(join(save_root, args.save_dir, 'stage1', 'best_model.ckpt'))['model'])
         else:
@@ -291,6 +290,7 @@ def main():
             pred_vals = torch.cat(pred_vals, 0)
             y_vals = torch.cat(y_vals, 0)
             total_val_accuracy = float(eval_utils.accuracy(pred_vals, y_vals, topk=(1,))[0])
+            print('stage3 accuracy: %0.3f'%(total_val_accuracy))
 
 
 if __name__ == '__main__':
