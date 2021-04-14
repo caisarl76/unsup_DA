@@ -41,7 +41,7 @@ def main():
 
             line = base + join(path, exp, 'stage2/best_model.ckpt') + ' --domain ' + trg + '\n'
 
-            f.write('echo trg: %s \n' % (src))
+            f.write('echo trg: %s \n' % (trg))
             f.write(line)
             # break
 
