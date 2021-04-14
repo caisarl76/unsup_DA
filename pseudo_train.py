@@ -33,7 +33,7 @@ def parse_args(args=None, namespace=None):
     parser.add_argument('--model-path', help='directory to save models', default='result/try1/best_model.ckpt',
                         type=str)
     parser.add_argument('--model-name', help='model name', default='resnet50dsbn')
-    parser.add_argument('--trg_domain', help='target training dataset', default='Clipart')
+    parser.add_argument('--trg-domain', help='target training dataset', default='Clipart')
 
     parser.add_argument('--num-workers', help='number of worker to load data', default=5, type=int)
     parser.add_argument('--batch-size', help='batch_size', default=10, type=int)
