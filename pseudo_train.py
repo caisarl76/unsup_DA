@@ -195,7 +195,7 @@ def main():
 
     student = get_model(args.model_name, 65, 65, 4, pretrained=True)
     teacher = get_model(args.model_name, 65, 65, 4, pretrained=True)
-    # teacher.load_state_dict(torch.load(args.model_path))
+    teacher.load_state_dict(torch.load(args.model_path))
 
     train_dataset = OFFICEHOME_multi(args.data_root, 1, [args.trg_domain], split='train')
     val_dataset = OFFICEHOME_multi(args.data_root, 1, [args.trg_domain], split='val')
