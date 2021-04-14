@@ -24,10 +24,11 @@ def main():
         path = join('/result', dir)
         exp_list = os.listdir(path)
         for exp in exp_list:
+            print(exp)
             src, trg = exp.split('_')
             src = domain_dict[src]
             trg = domain_dict[trg]
-            
-
+            print(dir, exp, src, trg)
+            break
 if __name__ == '__main__':
     main()
