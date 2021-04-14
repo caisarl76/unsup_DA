@@ -30,6 +30,6 @@ def main():
             src = domain_dict[src]
             trg = domain_dict[trg]
             print(dir, exp, src, trg)
-            break
+            # break
 if __name__ == '__main__':
     main()
