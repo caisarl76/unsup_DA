@@ -137,9 +137,9 @@ def main():
         torch.mean(torch.FloatTensor([c_val_acc for _, c_val_acc in val_accuracy_each_c])))
 
     print(total_val_accuracy)
-    for cls in val_accuracy_each_c:
-        print(cls)
-    print(mean_val_accuracy)
+    # for cls in val_accuracy_each_c:
+    #     print(cls)
+    # print(mean_val_accuracy)
     del x_val, y_val, pred_val, pred_vals, y_vals
     del test_dataloader_iter
 
