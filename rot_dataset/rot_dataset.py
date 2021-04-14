@@ -95,7 +95,8 @@ def make_dataset(dirs, transform, class_to_idx, extensions, include_dir=False):
             for root, _, fnames in sorted(os.walk(d)):
                 for fname in sorted(fnames):
                     if has_file_allowed_extension(fname, extensions):
-                        for i in np.random.permutation(4):
+                        angles = np.random.permutation(4)
+                        for i in angles:
                             path = os.path.join(root, fname)
                             item = (path, i)
                             items.append(item)

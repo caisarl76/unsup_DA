@@ -60,7 +60,7 @@ def main():
         os.makedirs(save_dir)
     print('stage: %d  , domain: %s' % (stage, args.trg_domain))
 
-    model = get_model(args.model_name, 65, 65, 2)
+    model = get_model(args.model_name, 65, 65, 4)
     # if (args.proceed) and (args.model_path):
     #     pre = torch.load(join(save_root, args.save_dir, 'stage1', 'best_model.ckpt'))['model']
     # elif (not args.proceed) and (args.model_path):
