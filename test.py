@@ -97,7 +97,7 @@ def main():
 
     model.eval()
     model = model.cuda(args.gpu)
-    test_dataset = OFFICEHOME_multi(args.data_root, num_domains, args.domain, transform=val_transform)
+    test_dataset = OFFICEHOME_multi(args.data_root, num_domains, args.domain, split='val')
     # test_dataset = rot_dataset(args.data_root, num_domains, args.domain, 'val')
 
     # test_dataset = SVHN(root='/data/jihun/SVHN', split='test', transform=svhn_transform, download=True)
