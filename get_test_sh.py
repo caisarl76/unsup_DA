@@ -19,7 +19,6 @@ dirs = ['rot_sup/resnet50',
         ]
 
 
-
 def main():
     f = open('run_test.sh', 'w')
     f.write('#!/bin/bash \n')
@@ -34,18 +33,20 @@ def main():
             trg = domain_dict[trg]
             print(dir, exp, src, trg)
 
-            line = base + join(path, exp, 'stage2/best_model.ckpt') +' --domain ' + src
+            line = base + join(path, exp, 'stage2/best_model.ckpt') + ' --domain ' + src + '\n'
             print(line)
-            f.write('echo exp: %s ' %(join(path, exp)))
-            f.write('echo src: %s '%(src))
+            f.write('echo exp: %s \n' % (join(path, exp)))
+            f.write('echo src: %s \n' % (src))
             f.write(line)
 
-            line = base + join(path, exp, 'stage2/best_model.ckpt') + ' --domain ' + trg
+            line = base + join(path, exp, 'stage2/best_model.ckpt') + ' --domain ' + trg + '\n'
 
-            f.write('echo trg: %s ' % (src))
+            f.write('echo trg: %s \n' % (src))
             f.write(line)
             # break
 
     f.close()
+
+
 if __name__ == '__main__':
     main()
