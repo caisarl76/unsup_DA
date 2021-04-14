@@ -57,19 +57,13 @@ def parse_args(args=None, namespace=None):
     parser.add_argument('--save-dir', help='directory to save models', default='result/try1', type=str)
     parser.add_argument('--model-path', help='directory to save models', default='result/try1/best_model.ckpt',
                         type=str)
-    parser.add_argument('--model-name', help='model name', default='resnet18dsbn')
+    parser.add_argument('--model-name', help='model name', default='resnet50dsbn')
     parser.add_argument('--domain', help='source training dataset', default=['Clipart'], nargs='+')
 
     parser.add_argument('--num-workers', help='number of worker to load data', default=5, type=int)
     parser.add_argument('--batch-size', help='batch_size', default=40, type=int)
     parser.add_argument("--iters", type=int, default=[10000, 10000], help="choose gpu device.", nargs='+')
     parser.add_argument("--gpu", type=int, default=0, help="choose gpu device.")
-
-    parser.add_argument('--learning-rate', '-lr', dest='learning_rate', help='learning_rate', default=1e-3, type=float)
-    parser.add_argument('--weight-decay', help='weight decay', default=0.0, type=float)
-
-    parser.add_argument('--proceed', help='proceed to next stage', default=True, type=bool)
-    parser.add_argument('--stage', help='starting stage', default=1, type=int)
 
     args = parser.parse_args(args=args, namespace=namespace)
     return args
@@ -80,9 +74,8 @@ def main():
     torch.cuda.set_device(args.gpu)
     num_domains = 1
     domain_num = domain_dict[args.domain[0]]
-    print('domain num:', domain_num)
-    print(args.ssl)
-
+    # print('domain num:', domain_num)
+    # print(args.ssl)
 
     model = get_model(args.model_name, 65, 65, 4, pretrained=True)
 
@@ -136,7 +129,7 @@ def main():
     mean_val_accuracy = float(
         torch.mean(torch.FloatTensor([c_val_acc for _, c_val_acc in val_accuracy_each_c])))
 
-    print(total_val_accuracy)
+    print('%0.3f'%(total_val_accuracy))
     # for cls in val_accuracy_each_c:
     #     print(cls)
     # print(mean_val_accuracy)
