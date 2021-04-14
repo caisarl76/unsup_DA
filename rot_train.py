@@ -47,9 +47,6 @@ def parse_args(args=None, namespace=None):
     parser.add_argument('--learning-rate', '-lr', dest='learning_rate', help='learning_rate', default=1e-3, type=float)
     parser.add_argument('--weight-decay', help='weight decay', default=0.0, type=float)
 
-    parser.add_argument('--proceed', help='proceed to next stage', default=True, type=bool)
-    parser.add_argument('--stage', help='starting stage', default=1, type=int)
-
     args = parser.parse_args(args=args, namespace=namespace)
     return args
 
@@ -154,7 +151,7 @@ def finetune(args, save_dir, domain_num, iters):
                                                                            class_idx=c, topk=(1,))[0]))
                                    for c, c_name in enumerate(val_dataset.classes)]
 
-            print('%d th iteration accuracy: %f ' % (i, total_val_accuracy))
+            print('%d th finetune accuracy: %f ' % (i, total_val_accuracy))
             del x_val, y_val, pred_val, pred_vals, y_vals
             del val_dataloader_iter
 
@@ -299,7 +296,6 @@ def main():
     if (args.save_root):
         save_root = args.save_root
 
-    stage = args.stage
     torch.cuda.set_device(args.gpu)
 
     trg_num = domain_dict[args.trg_domain]
