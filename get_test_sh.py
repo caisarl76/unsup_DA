@@ -8,7 +8,7 @@ from torchvision import transforms
 
 domain_dict = {'r': 'RealWorld', 'a': 'Art', 'c': 'Clipart', 'p': 'Product'}
 
-base = 'CUDA_VISIBLE_DEVICES=4 python test.py --data-root /data/OfficeHomeDataset_10072016 --model-name resnet50dsbn --model-path /result/rot_ssl/resnet50/'
+base = 'CUDA_VISIBLE_DEVICES=4 python test.py --data-root /data/OfficeHomeDataset_10072016 --model-name resnet50dsbn --model-path '
 
 dirs = ['rot_sup/resnet50',
         # 'byol_finetune',
@@ -25,11 +25,14 @@ def main():
         exp_list = os.listdir(path)
         for exp in exp_list:
             print(exp)
-
             src, trg = exp.split('_')
             src = domain_dict[src]
             trg = domain_dict[trg]
             print(dir, exp, src, trg)
+
+            line = base + join(path, exp, 'stage2/best_model.ckpt') +'--domain ' + src
+            print(line)
+
             # break
 if __name__ == '__main__':
     main()
