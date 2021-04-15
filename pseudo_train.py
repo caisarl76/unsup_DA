@@ -41,8 +41,8 @@ def parse_args(args=None, namespace=None):
 
     parser.add_argument('--num-workers', help='number of worker to load data', default=5, type=int)
     parser.add_argument('--batch-size', help='batch_size', default=10, type=int)
-    parser.add_argument("--iters", type=int, default=[30000, 10000], help="choose gpu device.", nargs='+')
-    parser.add_argument("--iter", type=int, default=30000, help="iteration for teacher training.")
+    parser.add_argument("--iters", type=int, default=[550, 550], help="choose gpu device.", nargs='+')
+    parser.add_argument("--iter", type=int, default=550, help="iteration for teacher training.")
     parser.add_argument("--gpu", type=int, default=0, help="choose gpu device.")
 
     parser.add_argument('--learning-rate', '-lr', dest='learning_rate', help='learning_rate', default=1e-3, type=float)
@@ -198,37 +198,50 @@ def main():
     trg_val = OFFICEHOME_multi(args.data_root, 1, [args.trg_domain], split='val')
 
     ###################### train teacher model ######################
+    t_path = '/result/rot_sup/resnet50/%s_%s/' % (
+        args.trg_domain[0].lower(), args.src_domain[0].lower())
+
     if (args.save_root):
         save_root = args.save_root
     torch.cuda.set_device(args.gpu)
 
     teacher = get_model(args.model_name, 65, 65, 4, pretrained=True)
 
-    t_path = '/result/rot_sup/resnet50/%s_%s/stage1/best_model.ckpt' % (
-        args.trg_domain[0].lower(), args.src_domain[0].lower())
-    if os.path.isfile(t_path):
-        print('teacher exists')
-        teacher.load_state_dict(torch.load(t_path)['model'])
-    else:
-        save_dir = join(save_root, args.save_dir, 'teacher/stage1')
+    t2_path = join(t_path, 'stage2/best_model.ckpt')
+    if not os.path.isfile(t2_path):
+        print('teacher2 not exists')
+
+        t1_path = join(t_path, 'stage1/best_model.ckpt')
+        if os.path.isfile(t1_path):
+            print('teacher1 exists')
+            teacher.load_state_dict(torch.load(t1_path)['model'])
+        else:
+            print('teacher1 not exists')
+            save_dir = join(save_root, args.save_dir, 'teacher/stage1')
+            if not os.path.isdir(save_dir):
+                os.makedirs(save_dir, exist_ok=True)
+            print('save dir: ', save_dir)
+            teacher = normal_train(args, teacher, src_train, src_val, args.iters[0], save_dir, args.src_domain)
+
+        bn_name = 'bns.' + (str)(domain_dict[trg_train.domain[0]])
+        for name, p in teacher.named_parameters():
+            if bn_name in name:
+                p.requires_grad = True
+            else:
+                p.requires_grad = False
+
+        save_dir = join(save_root, args.save_dir, 'teacher/stage2')
         if not os.path.isdir(save_dir):
             os.makedirs(save_dir, exist_ok=True)
         print('save dir: ', save_dir)
-        teacher = normal_train(args, teacher, src_train, src_val, args.iters[0], save_dir, args.src_domain)
 
-    bn_name = 'bns.' + (str)(domain_dict[trg_train.domain[0]])
-    for name, p in teacher.named_parameters():
-        if bn_name in name:
-            p.requires_grad = True
-        else:
-            p.requires_grad = False
+        normal_train(args, teacher, trg_train, trg_val, args.iter, save_dir, args.trg_domain)
 
-    save_dir = join(save_root, args.save_dir, 'teacher/stage2')
-    if not os.path.isdir(save_dir):
-        os.makedirs(save_dir, exist_ok=True)
-    print('save dir: ', save_dir)
+    else:
+        print('teacher exists')
+        teacher.load_state_dict(torch.load(t2_path)['model'])
 
-    normal_train(args, teacher, trg_train, trg_val, args.iter, save_dir, args.trg_domain)
+
 
     if not args.proceed:
         return
