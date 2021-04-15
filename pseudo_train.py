@@ -37,7 +37,7 @@ def parse_args(args=None, namespace=None):
     parser.add_argument('--src-domain', help='source training dataset', default='Clipart')
 
     parser.add_argument('--proceed', help='proceed to train student', action='store_true')
-    parser.add_argument("--iters", type=int, default=[550, 550], help="choose gpu device.", nargs='+')
+    parser.add_argument("--iters", type=int, default=[30000, 10000], help="choose gpu device.", nargs='+')
 
     parser.add_argument('--num-workers', help='number of worker to load data', default=5, type=int)
     parser.add_argument('--batch-size', help='batch_size', default=10, type=int)
@@ -100,7 +100,7 @@ def ps_test(args, teacher, student, val_dataset, save_dir, domain_num):
     return student, val_acc, student_acc
 
 
-def ps_train(args, teacher, student, train_dataset, val_dataset, save_dir, domain_num):
+def ps_train(args, teacher, student, train_dataset, val_dataset, save_dir, domain):
     train_dataloader = util_data.DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True,
                                             num_workers=args.num_workers, drop_last=True, pin_memory=True)
     train_dataloader_iters = enumerate(train_dataloader)
@@ -117,7 +117,8 @@ def ps_train(args, teacher, student, train_dataset, val_dataset, save_dir, domai
     ce_loss = nn.CrossEntropyLoss()
 
     writer = SummaryWriter(log_dir=join(save_dir, 'logs'))
-    print('domain: %s , domain_num: %d' % (args.trg_domain, domain_num))
+    domain_num = domain_dict[domain]
+    print('domain: %s , domain_num: %d' % (domain, domain_num))
 
     global best_accuracy
     global best_accuracies_each_c
@@ -200,11 +201,6 @@ def main():
         save_root = args.save_root
     torch.cuda.set_device(args.gpu)
 
-    save_dir = join(save_root, args.save_dir, 'teacher/stage1')
-    if not os.path.isdir(save_dir):
-        os.makedirs(save_dir, exist_ok=True)
-    print('save dir: ', save_dir)
-
     teacher = get_model(args.model_name, 65, 65, 4, pretrained=True)
 
     t_path = '/result/rot_sup/resnet50/%s_%s/stage1/best_model.ckpt' % (
@@ -213,7 +209,11 @@ def main():
         print('teacher exists')
         teacher.load_state_dict(torch.load(t_path)['model'])
     else:
-        teacher = normal_train(args, teacher, src_train, src_val, args.iters[0], save_dir, src_train.domain[0])
+        save_dir = join(save_root, args.save_dir, 'teacher/stage1')
+        if not os.path.isdir(save_dir):
+            os.makedirs(save_dir, exist_ok=True)
+        print('save dir: ', save_dir)
+        teacher = normal_train(args, teacher, src_train, src_val, args.iters[0], save_dir, args.src_domain)
 
     bn_name = 'bns.' + (str)(domain_dict[trg_train.domain[0]])
     for name, p in teacher.named_parameters():
@@ -227,7 +227,7 @@ def main():
         os.makedirs(save_dir, exist_ok=True)
     print('save dir: ', save_dir)
 
-    normal_train(args, teacher, trg_train, trg_val, args.iters[1], save_dir, trg_train.domain[0])
+    normal_train(args, teacher, trg_train, trg_val, args.iters[1], save_dir, args.trg_domain)
 
     if not args.proceed:
         return
@@ -240,7 +240,7 @@ def main():
 
     student = get_model(args.model_name, 65, 65, 4, pretrained=True)
 
-    ps_train(args, teacher, student, trg_train, trg_val, save_dir, trg_train.domain[0])
+    ps_train(args, teacher, student, trg_train, trg_val, save_dir, args.trg_domain)
 
 
 if __name__ == '__main__':
