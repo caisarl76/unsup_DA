@@ -31,7 +31,7 @@ def parse_args(args=None, namespace=None):
                         default='/data/jihun/OfficeHomeDataset_10072016/')
     parser.add_argument('--save-root', help='directory to save models', default=None, type=str)
     parser.add_argument('--save-dir', help='directory to save models', default='pseudo', type=str)
-    parser.add_argument('--teacher-model', help='dir where teacher model trained by src(stage1)', type=str)
+    # parser.add_argument('--teacher-model', help='dir where teacher model trained by src(stage1)', type=str)
     parser.add_argument('--model-name', help='model name', default='resnet50dsbn')
     parser.add_argument('--trg-domain', help='target training dataset', default='Clipart')
     parser.add_argument('--src-domain', help='source training dataset', default='Clipart')
@@ -206,7 +206,9 @@ def main():
 
     t_path = '/result/rot_sup/resnet50/%s_%s/stage1/best_model.ckpt' % (
     args.trg_domain[0].upper(), args.src_domain[0].upper())
+    print(t_path)
     if os.path.isfile(t_path):
+        print('teacher exists')
         teacher.load_state_dict(torch.load(t_path))
     else:
         teacher = normal_train(args, teacher, src_train, src_val, args.iters[0], save_dir, src_train.domain[0])
