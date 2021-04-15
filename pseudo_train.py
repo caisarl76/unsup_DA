@@ -31,8 +31,8 @@ def parse_args(args=None, namespace=None):
                         default='/data/jihun/OfficeHomeDataset_10072016/')
     parser.add_argument('--save-root', help='directory to save models', default=None, type=str)
     parser.add_argument('--save-dir', help='directory to save models', default='pseudo', type=str)
-    # parser.add_argument('--model-path', help='directory to save models', default='result/try1/best_model.ckpt',
-    #                     type=str)
+    parser.add_argument('--model-path', help='directory to save models', default='result/try1/best_model.ckpt',
+                        type=str)
     parser.add_argument('--model-name', help='model name', default='resnet50dsbn')
     parser.add_argument('--trg-domain', help='target training dataset', default='Clipart')
     parser.add_argument('--src-domain', help='source training dataset', default='Clipart')
