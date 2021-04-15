@@ -52,7 +52,7 @@ def parse_args(args=None, namespace=None):
     return args
 
 
-def ps_test(args, teacher, student, val_dataset, save_dir, domain_num):
+def ps_test(args, teacher, student, val_dataset, domain_num):
     val_dataloader = util_data.DataLoader(val_dataset, batch_size=args.batch_size, shuffle=True,
                                           num_workers=args.num_workers, drop_last=True, pin_memory=True)
     val_dataloader_iter = enumerate(val_dataloader)
