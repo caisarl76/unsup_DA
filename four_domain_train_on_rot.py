@@ -23,6 +23,7 @@ save_root = '/media/hd/jihun/dsbn_result/new/'
 
 domain_dict = {'RealWorld': 0, 'Art': 1, 'Clipart': 2, 'Product': 3}
 
+
 def parse_args(args=None, namespace=None):
     parser = argparse.ArgumentParser()
     parser.add_argument('--data-root', type=str, help='Path to dataset folder',
@@ -31,7 +32,8 @@ def parse_args(args=None, namespace=None):
     parser.add_argument('--save-dir', help='directory to save models', default='result/try1', type=str)
     parser.add_argument('--ssl', help='stage 1 selfsup learning', action='store_true')
     parser.add_argument('--byol', help='load byol weights on stage 1', action='store_true')
-    parser.add_argument('--byol-path', help='byol weights path', type=str, default='byol/byol_r50_bs256_accmulate16_ep300-5df46722.pth')
+    parser.add_argument('--byol-path', help='byol weights path', type=str,
+                        default='byol/byol_r50_bs256_accmulate16_ep300-5df46722.pth')
     parser.add_argument('--model-path', help='directory to save models', default='result/try1/best_model.ckpt',
                         type=str)
     parser.add_argument('--model-name', help='model name', default='resnet50dsbn')
@@ -147,7 +149,7 @@ def train(args, model, train_dataset, val_dataset, stage, save_dir, domain_num):
             # save best checkpoint
             io_utils.save_check(save_dir, i, model_dict, optimizer_dict, best=False)
 
-              # train mode
+            # train mode
             if val_accuracy > best_accuracy:
                 best_accuracy = val_accuracy
                 best_accuracies_each_c = val_accuracies_each_c
@@ -195,11 +197,11 @@ def load_byol_weight(model, byol_path):
     model.load_state_dict(new_dict, strict=False)
     return model
 
+
 def main():
     args = parse_args()
-    if(args.save_root):
+    if (args.save_root):
         save_root = args.save_root
-
 
     stage = args.stage
     torch.cuda.set_device(args.gpu)
@@ -214,7 +216,7 @@ def main():
             os.makedirs(save_dir, exist_ok=True)
         print('domain: ', args.trg_domain)
 
-        if(args.ssl):
+        if (args.ssl):
             model = get_rot_model(args.model_name, num_domains=4)
             if (args.byol):
                 model = load_byol_weight(model, byol_path=args.byol_path)
@@ -239,7 +241,7 @@ def main():
         print('domain: ', args.src_domain)
         model = get_model(args.model_name, 65, 65, 4, pretrained=False)
         if (args.proceed):
-            if(args.ssl):
+            if (args.ssl):
                 pre = torch.load(join(save_root, args.save_dir, 'stage1', 'best_model.ckpt'))['model']
                 new_pre = OrderedDict()
                 for p in pre:
@@ -251,10 +253,11 @@ def main():
                 del new_pre
             else:
                 model.load_state_dict(torch.load(join(save_root, args.save_dir, 'stage1', 'best_model.ckpt'))['model'])
+                print('model load from %s' % (join(save_root, args.save_dir)))
         else:
             model.load_state_dict(torch.load(join(save_root, args.model_path))['model'])
-
-        bn_name = 'bns.'+(str)(src_num)
+            print('model load from %s' % (join(save_root, args.model_path)))
+        bn_name = 'bns.' + (str)(src_num)
         for name, p in model.named_parameters():
             if ('fc' in name) or bn_name in name:
                 p.requires_grad = True
@@ -266,7 +269,6 @@ def main():
         val_dataset = OFFICEHOME_multi(args.data_root, 1, [args.src_domain], split='val')
 
         train(args, model, train_dataset, val_dataset, stage, save_dir, src_num)
-
 
         val_dataset = OFFICEHOME_multi(args.data_root, 1, [args.trg_domain], split='val')
         val_dataloader = util_data.DataLoader(val_dataset, batch_size=args.batch_size, shuffle=True,
@@ -291,7 +293,7 @@ def main():
         pred_vals = torch.cat(pred_vals, 0)
         y_vals = torch.cat(y_vals, 0)
         total_val_accuracy = float(eval_utils.accuracy(pred_vals, y_vals, topk=(1,))[0])
-        print('stage3 accuracy: %0.3f'%(total_val_accuracy))
+        print('stage3 accuracy: %0.3f' % (total_val_accuracy))
 
 
 if __name__ == '__main__':
