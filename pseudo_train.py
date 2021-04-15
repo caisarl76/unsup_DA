@@ -37,7 +37,7 @@ def parse_args(args=None, namespace=None):
     parser.add_argument('--src-domain', help='source training dataset', default='Clipart')
 
     parser.add_argument('--proceed', help='proceed to train student', action='store_true')
-    parser.add_argument("--iters", type=int, default=[30000, 10000], help="choose gpu device.", nargs='+')
+    parser.add_argument("--iters", type=int, default=[30000, 30000], help="choose gpu device.", nargs='+')
 
     parser.add_argument('--num-workers', help='number of worker to load data', default=5, type=int)
     parser.add_argument('--batch-size', help='batch_size', default=10, type=int)
