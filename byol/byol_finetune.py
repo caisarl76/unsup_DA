@@ -155,12 +155,6 @@ def train(args, model, train_dataset, val_dataset, save_dir, domain_num):
             del x_val, y_val, pred_val, pred_vals, y_vals
             del val_dataloader_iter
 
-            model_dict = {'model': model.cpu().state_dict()}
-            optimizer_dict = {'optimizer': optimizer.state_dict()}
-
-            # save best checkpoint
-            io_utils.save_check(save_dir, i, model_dict, optimizer_dict, best=False)
-
             # train mode
             if val_accuracy > best_accuracy:
                 best_accuracy = val_accuracy
@@ -178,6 +172,12 @@ def train(args, model, train_dataset, val_dataset, save_dir, domain_num):
 
         if (i % 10000 == 0 and i != 0):
             print('%d iter complete' % (i))
+            model_dict = {'model': model.cpu().state_dict()}
+            optimizer_dict = {'optimizer': optimizer.state_dict()}
+
+            # save best checkpoint
+            io_utils.save_check(save_dir, i, model_dict, optimizer_dict, best=False)
+
     writer.flush()
     writer.close()
 

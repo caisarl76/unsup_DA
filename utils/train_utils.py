@@ -1,10 +1,113 @@
 import math
+from os.path import join as join
 import torch
 from torch import nn as nn
 from torch.nn import init
 import torch.nn.functional as F
 from collections import defaultdict
 from torch.autograd import Variable
+from torch.utils import data as util_data
+from torch.utils.tensorboard import SummaryWriter
+import torch.optim as optim
+
+from utils import io_utils, eval_utils
+
+domain_dict = {'RealWorld': 0, 'Art': 1, 'Clipart': 2, 'Product': 3}
+
+def test(args, model, val_dataset, domain_num):
+    val_dataloader = util_data.DataLoader(val_dataset, batch_size=args.batch_size, shuffle=True,
+                                          num_workers=args.num_workers, drop_last=True, pin_memory=True)
+    val_dataloader_iter = enumerate(val_dataloader)
+
+    val_accs_each_c = []
+    pred_ys = []
+    y_vals = []
+    x_val = None
+    y_val = None
+
+    model.eval()
+    with torch.no_grad():
+        for j, (x_val, y_val) in val_dataloader_iter:
+            y_vals.append(y_val.cpu())
+            x_val = x_val.cuda(args.gpu)
+            y_val = y_val.cuda(args.gpu)
+
+            pred_y = model(x_val, domain_num * torch.ones_like(y_val), with_ft=False)
+            pred_ys.append(pred_y.cpu())
+
+    pred_ys = torch.cat(pred_ys, 0)
+    y_vals = torch.cat(y_vals, 0)
+    val_acc = float(eval_utils.accuracy(pred_ys, y_vals, topk=(1,))[0])
+    val_acc_each_c = [(c_name, float(eval_utils.accuracy_of_c(pred_ys, y_vals,
+                                                              class_idx=c, topk=(1,))[0]))
+                      for c, c_name in enumerate(val_dataset.classes)]
+
+    return model, val_acc
+
+
+def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain):
+    train_dataloader = util_data.DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True,
+                                            num_workers=args.num_workers, drop_last=True, pin_memory=True)
+    train_dataloader_iters = enumerate(train_dataloader)
+
+    model.train(True)
+    model = model.cuda(args.gpu)
+
+    params = get_optimizer_params(model, args.learning_rate, weight_decay=args.weight_decay,
+                                  double_bias_lr=True, base_weight_factor=0.1)
+
+    optimizer = optim.Adam(params, betas=(0.9, 0.999))
+    ce_loss = nn.CrossEntropyLoss()
+
+    writer = SummaryWriter(log_dir=join(save_dir, 'logs'))
+    domain_num = domain_dict[domain]
+    print('domain: %s, %d' % (domain, domain_num))
+    global best_accuracy
+    global best_accuracies_each_c
+    global best_mean_val_accuracies
+    global best_total_val_accuracies
+
+    best_accuracy = 0.0
+    best_accuracies_each_c = []
+    best_mean_val_accuracies = []
+    best_total_val_accuracies = []
+
+    for i in range(iter):
+        try:
+            _, (x_s, y_s) = train_dataloader_iters.__next__()
+        except StopIteration:
+            train_dataloader_iters = enumerate(train_dataloader)
+            _, (x_s, y_s) = train_dataloader_iters.__next__()
+
+        optimizer.zero_grad()
+
+        x_s, y_s = x_s.cuda(args.gpu), y_s.cuda(args.gpu)
+        domain_idx = torch.ones(x_s.shape[0], dtype=torch.long).cuda(args.gpu)
+        pred, f = model(x_s, domain_num * domain_idx, with_ft=True)
+        loss = ce_loss(pred, y_s)
+        writer.add_scalar("Train Loss", loss, i)
+        loss.backward()
+        optimizer.step()
+
+        if (i % 500 == 0 and i != 0):
+            model, acc = test(args, model, val_dataset, domain_num)
+            print('%d iter || val acc: %0.3f' % (i, acc))
+            writer.add_scalar("Val Accuracy", acc, i)
+            if acc > best_accuracy:
+                best_accuracy = acc
+                model_dict = {'model': model.cpu().state_dict()}
+                optimizer_dict = {'optimizer': optimizer.state_dict()}
+
+                # save best checkpoint
+                io_utils.save_check(save_dir, i, model_dict, optimizer_dict, best=True)
+            if (i % 10000 == 0 and i != 0):
+                print('%d iter complete' % (i))
+
+            model.train(True)
+            model = model.cuda(args.gpu)
+
+    writer.flush()
+    writer.close()
 
 
 def adaptation_factor(p, gamma=10):

@@ -17,6 +17,7 @@ from dataset.datasets import OFFICEHOME_multi
 from model.factory import get_model
 from utils.train_utils import adaptation_factor, semantic_loss_calc, get_optimizer_params
 from utils.train_utils import LRScheduler, Monitor
+from utils.train_utils import normal_train, test
 from utils import io_utils, eval_utils
 
 root = '/media/hd/jihun/dsbn_result/new/'
@@ -29,11 +30,15 @@ def parse_args(args=None, namespace=None):
     parser.add_argument('--data-root', type=str, help='Path to dataset folder',
                         default='/data/jihun/OfficeHomeDataset_10072016/')
     parser.add_argument('--save-root', help='directory to save models', default=None, type=str)
-    parser.add_argument('--save-dir', help='directory to save models', default='result/try1', type=str)
-    parser.add_argument('--model-path', help='directory to save models', default='result/try1/best_model.ckpt',
-                        type=str)
+    parser.add_argument('--save-dir', help='directory to save models', default='pseudo', type=str)
+    # parser.add_argument('--model-path', help='directory to save models', default='result/try1/best_model.ckpt',
+    #                     type=str)
     parser.add_argument('--model-name', help='model name', default='resnet50dsbn')
     parser.add_argument('--trg-domain', help='target training dataset', default='Clipart')
+    parser.add_argument('--src-domain', help='source training dataset', default='Clipart')
+
+    parser.add_argument('--proceed', help='proceed to train student', action='store_true')
+    parser.add_argument("--iters", type=int, default=[550, 550], help="choose gpu device.", nargs='+')
 
     parser.add_argument('--num-workers', help='number of worker to load data', default=5, type=int)
     parser.add_argument('--batch-size', help='batch_size', default=10, type=int)
@@ -47,7 +52,7 @@ def parse_args(args=None, namespace=None):
     return args
 
 
-def test(args, teacher, student, val_dataset, save_dir, domain_num):
+def ps_test(args, teacher, student, val_dataset, save_dir, domain_num):
     val_dataloader = util_data.DataLoader(val_dataset, batch_size=args.batch_size, shuffle=True,
                                           num_workers=args.num_workers, drop_last=True, pin_memory=True)
     val_dataloader_iter = enumerate(val_dataloader)
@@ -96,7 +101,7 @@ def test(args, teacher, student, val_dataset, save_dir, domain_num):
     return student, val_acc, student_acc
 
 
-def train(args, teacher, student, train_dataset, val_dataset, save_dir, domain_num):
+def ps_train(args, teacher, student, train_dataset, val_dataset, save_dir, domain_num):
     train_dataloader = util_data.DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True,
                                             num_workers=args.num_workers, drop_last=True, pin_memory=True)
     train_dataloader_iters = enumerate(train_dataloader)
@@ -148,7 +153,7 @@ def train(args, teacher, student, train_dataset, val_dataset, save_dir, domain_n
         optimizer.step()
 
         if (i % 500 == 0 and i != 0):
-            student, val_acc, student_acc = test(args, teacher, student, val_dataset, save_dir, domain_num)
+            student, val_acc, student_acc = ps_test(args, teacher, student, val_dataset, save_dir, domain_num)
             print('%d iter || student acc: %0.3f, ||  val acc: %0.3f' % (i, student_acc, val_acc))
             writer.add_scalar("Val Accuracy", val_acc, i)
             writer.add_scalar("Student Accuracy", student_acc, i)
@@ -182,26 +187,53 @@ def train(args, teacher, student, train_dataset, val_dataset, save_dir, domain_n
 def main():
     save_root = root
     args = parse_args()
+
+    src_train = OFFICEHOME_multi(args.data_root, 1, [args.src_domain], split='train')
+    src_val = OFFICEHOME_multi(args.data_root, 1, [args.src_domain], split='val')
+
+    trg_train = OFFICEHOME_multi(args.data_root, 1, [args.trg_domain], split='train')
+    trg_val = OFFICEHOME_multi(args.data_root, 1, [args.trg_domain], split='val')
+
+
+    ###################### train teacher model ######################
     if (args.save_root):
         save_root = args.save_root
-
-
     torch.cuda.set_device(args.gpu)
 
-    save_dir = join(save_root, args.save_dir, 'stage1')
+    save_dir = join(save_root, args.save_dir, 'teacher/stage1')
     if not os.path.isdir(save_dir):
         os.makedirs(save_dir, exist_ok=True)
     print('save dir: ', save_dir)
-    print('domain: ', args.trg_domain)
+
+    teacher = get_model(args.model_name, 65, 65, 4, pretrained=True)
+    normal_train(args, teacher, src_train, src_val, args.iters[0], save_dir, src_train.domain[0])
+
+    bn_name = 'bns.' + (str)(domain_dict[trg_train.domain[0]])
+    for name, p in teacher.named_parameters():
+        if bn_name in name:
+            p.requires_grad = True
+        else:
+            p.requires_grad = False
+
+    save_dir = join(save_root, args.save_dir, 'teacher/stage2')
+    if not os.path.isdir(save_dir):
+        os.makedirs(save_dir, exist_ok=True)
+    print('save dir: ', save_dir)
+
+    normal_train(args, teacher, trg_train, trg_val, args.iters[1], save_dir, trg_train.domain[0])
+
+    if not args.proceed:
+        return
+
+    ###################### train student model ######################
+    save_dir = join(save_root, args.save_dir, 'student/stage1')
+    if not os.path.isdir(save_dir):
+        os.makedirs(save_dir, exist_ok=True)
+    print('save dir: ', save_dir)
 
     student = get_model(args.model_name, 65, 65, 4, pretrained=True)
-    teacher = get_model(args.model_name, 65, 65, 4, pretrained=True)
-    teacher.load_state_dict(torch.load(args.model_path)['model'])
 
-    train_dataset = OFFICEHOME_multi(args.data_root, 1, [args.trg_domain], split='train')
-    val_dataset = OFFICEHOME_multi(args.data_root, 1, [args.trg_domain], split='val')
-
-    train(args, teacher, student, train_dataset, val_dataset, save_dir, domain_dict[args.trg_domain])
+    ps_train(args, teacher, student, trg_train, trg_val, save_dir, train_dataset.domain[0])
 
 
 if __name__ == '__main__':
