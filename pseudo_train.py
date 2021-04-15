@@ -153,7 +153,7 @@ def ps_train(args, teacher, student, train_dataset, val_dataset, save_dir, domai
         optimizer.step()
 
         if (i % 500 == 0 and i != 0):
-            student, val_acc, student_acc = ps_test(args, teacher, student, val_dataset, save_dir, domain_num)
+            student, val_acc, student_acc = ps_test(args, teacher, student, val_dataset, domain_num)
             print('%d iter || student acc: %0.3f, ||  val acc: %0.3f' % (i, student_acc, val_acc))
             writer.add_scalar("Val Accuracy", val_acc, i)
             writer.add_scalar("Student Accuracy", student_acc, i)
