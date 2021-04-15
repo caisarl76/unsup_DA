@@ -205,7 +205,7 @@ def main():
     teacher = get_model(args.model_name, 65, 65, 4, pretrained=True)
 
     t_path = '/result/rot_sup/resnet50/%s_%s/stage1/best_model.ckpt' % (
-    args.trg_domain[0].upper(), args.src_domain[0].upper())
+    args.trg_domain[0].lower(), args.src_domain[0].lower())
     print(t_path)
     if os.path.isfile(t_path):
         print('teacher exists')
