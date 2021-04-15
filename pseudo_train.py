@@ -186,6 +186,9 @@ def main():
     save_root = root
     args = parse_args()
 
+    print('pseudo train, ')
+    print('|%s| to |%s| training' % (args.src_domain, args.trg_domain))
+
     src_train = OFFICEHOME_multi(args.data_root, 1, [args.src_domain], split='train')
     src_val = OFFICEHOME_multi(args.data_root, 1, [args.src_domain], split='val')
 
@@ -205,14 +208,12 @@ def main():
     teacher = get_model(args.model_name, 65, 65, 4, pretrained=True)
 
     t_path = '/result/rot_sup/resnet50/%s_%s/stage1/best_model.ckpt' % (
-    args.trg_domain[0].lower(), args.src_domain[0].lower())
-    print(t_path)
+        args.trg_domain[0].lower(), args.src_domain[0].lower())
     if os.path.isfile(t_path):
         print('teacher exists')
         teacher.load_state_dict(torch.load(t_path)['model'])
     else:
         teacher = normal_train(args, teacher, src_train, src_val, args.iters[0], save_dir, src_train.domain[0])
-    return
 
     bn_name = 'bns.' + (str)(domain_dict[trg_train.domain[0]])
     for name, p in teacher.named_parameters():
