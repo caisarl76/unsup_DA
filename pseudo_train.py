@@ -241,11 +241,6 @@ def main():
         print('teacher exists')
         teacher.load_state_dict(torch.load(t2_path)['model'])
 
-
-
-    if not args.proceed:
-        return
-
     ###################### train student model ######################
     save_dir = join(save_root, args.save_dir, 'student/stage1')
     if not os.path.isdir(save_dir):
