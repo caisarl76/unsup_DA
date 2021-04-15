@@ -184,13 +184,14 @@ def main():
     args = parse_args()
     if (args.save_root):
         save_root = args.save_root
-        print('save root: ', save_root)
+
 
     torch.cuda.set_device(args.gpu)
 
     save_dir = join(save_root, args.save_dir, 'stage1')
     if not os.path.isdir(save_dir):
         os.makedirs(save_dir, exist_ok=True)
+    print('save dir: ', save_dir)
     print('domain: ', args.trg_domain)
 
     student = get_model(args.model_name, 65, 65, 4, pretrained=True)
