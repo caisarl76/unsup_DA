@@ -209,7 +209,7 @@ def main():
     print(t_path)
     if os.path.isfile(t_path):
         print('teacher exists')
-        teacher.load_state_dict(torch.load(t_path))
+        teacher.load_state_dict(torch.load(t_path)['model'])
     else:
         teacher = normal_train(args, teacher, src_train, src_val, args.iters[0], save_dir, src_train.domain[0])
     return
