@@ -267,31 +267,31 @@ def main():
 
         train(args, model, train_dataset, val_dataset, stage, save_dir, src_num)
 
-        if (args.proceed):
-            val_dataset = OFFICEHOME_multi(args.data_root, 1, [args.trg_domain], split='val')
-            val_dataloader = util_data.DataLoader(val_dataset, batch_size=args.batch_size, shuffle=True,
-                                                  num_workers=args.num_workers, drop_last=True, pin_memory=True)
-            val_dataloader_iter = enumerate(val_dataloader)
 
-            pred_vals = []
-            y_vals = []
-            x_val = None
-            y_val = None
-            # print('------------------------dataload------------------------')
-            with torch.no_grad():
-                for j, (x_val, y_val) in val_dataloader_iter:
-                    y_vals.append(y_val.cpu())
-                    x_val = x_val.cuda(args.gpu)
-                    y_val = y_val.cuda(args.gpu)
+        val_dataset = OFFICEHOME_multi(args.data_root, 1, [args.trg_domain], split='val')
+        val_dataloader = util_data.DataLoader(val_dataset, batch_size=args.batch_size, shuffle=True,
+                                              num_workers=args.num_workers, drop_last=True, pin_memory=True)
+        val_dataloader_iter = enumerate(val_dataloader)
 
-                    pred_val = model(x_val, trg_num * torch.ones_like(y_val), with_ft=False)
+        pred_vals = []
+        y_vals = []
+        x_val = None
+        y_val = None
+        # print('------------------------dataload------------------------')
+        with torch.no_grad():
+            for j, (x_val, y_val) in val_dataloader_iter:
+                y_vals.append(y_val.cpu())
+                x_val = x_val.cuda(args.gpu)
+                y_val = y_val.cuda(args.gpu)
 
-                    pred_vals.append(pred_val.cpu())
+                pred_val = model(x_val, trg_num * torch.ones_like(y_val), with_ft=False)
 
-            pred_vals = torch.cat(pred_vals, 0)
-            y_vals = torch.cat(y_vals, 0)
-            total_val_accuracy = float(eval_utils.accuracy(pred_vals, y_vals, topk=(1,))[0])
-            print('stage3 accuracy: %0.3f'%(total_val_accuracy))
+                pred_vals.append(pred_val.cpu())
+
+        pred_vals = torch.cat(pred_vals, 0)
+        y_vals = torch.cat(y_vals, 0)
+        total_val_accuracy = float(eval_utils.accuracy(pred_vals, y_vals, topk=(1,))[0])
+        print('stage3 accuracy: %0.3f'%(total_val_accuracy))
 
 
 if __name__ == '__main__':

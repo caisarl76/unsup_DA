@@ -109,6 +109,7 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
     writer.flush()
     writer.close()
 
+    return model
 
 def adaptation_factor(p, gamma=10):
     p = max(min(p, 1.0), 0.0)

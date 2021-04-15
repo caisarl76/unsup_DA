@@ -31,8 +31,7 @@ def parse_args(args=None, namespace=None):
                         default='/data/jihun/OfficeHomeDataset_10072016/')
     parser.add_argument('--save-root', help='directory to save models', default=None, type=str)
     parser.add_argument('--save-dir', help='directory to save models', default='pseudo', type=str)
-    parser.add_argument('--model-path', help='directory to save models', default='result/try1/best_model.ckpt',
-                        type=str)
+    parser.add_argument('--teacher-model', help='dir where teacher model trained by src(stage1)', type=str)
     parser.add_argument('--model-name', help='model name', default='resnet50dsbn')
     parser.add_argument('--trg-domain', help='target training dataset', default='Clipart')
     parser.add_argument('--src-domain', help='source training dataset', default='Clipart')
@@ -146,7 +145,6 @@ def ps_train(args, teacher, student, train_dataset, val_dataset, save_dir, domai
         p_y = teacher(x_s, domain_num * domain_idx, with_ft=False)
         # print(type(student), type(domain_num), type(domain_idx), type(x_s))
 
-
         loss = ce_loss(pred_y, p_y.argmax(axis=1))
         writer.add_scalar("Train Loss", loss, i)
         loss.backward()
@@ -194,7 +192,6 @@ def main():
     trg_train = OFFICEHOME_multi(args.data_root, 1, [args.trg_domain], split='train')
     trg_val = OFFICEHOME_multi(args.data_root, 1, [args.trg_domain], split='val')
 
-
     ###################### train teacher model ######################
     if (args.save_root):
         save_root = args.save_root
@@ -206,7 +203,14 @@ def main():
     print('save dir: ', save_dir)
 
     teacher = get_model(args.model_name, 65, 65, 4, pretrained=True)
-    normal_train(args, teacher, src_train, src_val, args.iters[0], save_dir, src_train.domain[0])
+
+    t_path = '/result/rot_sup/resnet50/%s_%s/stage1/best_model.ckpt' % (
+    args.trg_domain[0].upper(), args.src_domain[0].upper())
+    if os.path.isfile(t_path):
+        teacher.load_state_dict(torch.load(t_path))
+    else:
+        teacher = normal_train(args, teacher, src_train, src_val, args.iters[0], save_dir, src_train.domain[0])
+    return
 
     bn_name = 'bns.' + (str)(domain_dict[trg_train.domain[0]])
     for name, p in teacher.named_parameters():
@@ -233,7 +237,7 @@ def main():
 
     student = get_model(args.model_name, 65, 65, 4, pretrained=True)
 
-    ps_train(args, teacher, student, trg_train, trg_val, save_dir, train_dataset.domain[0])
+    ps_train(args, teacher, student, trg_train, trg_val, save_dir, trg_train.domain[0])
 
 
 if __name__ == '__main__':
