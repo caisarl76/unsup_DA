@@ -85,7 +85,7 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
         pred, f = model(x_s, domain_num * domain_idx, with_ft=True)
         loss = ce_loss(pred, y_s)
         writer.add_scalar("Train Loss", loss, i)
-        if (freeze):
+        if not freeze:
             loss.backward()
             optimizer.step()
 
