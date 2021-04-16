@@ -45,7 +45,7 @@ def test(args, model, val_dataset, domain_num):
     return model, val_acc
 
 
-def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain):
+def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain, freeze=False):
     train_dataloader = util_data.DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True,
                                             num_workers=args.num_workers, drop_last=True, pin_memory=True)
     train_dataloader_iters = enumerate(train_dataloader)
@@ -55,7 +55,6 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
 
     params = get_optimizer_params(model, args.learning_rate, weight_decay=args.weight_decay,
                                   double_bias_lr=True, base_weight_factor=0.1)
-
     optimizer = optim.Adam(params, betas=(0.9, 0.999))
     ce_loss = nn.CrossEntropyLoss()
 
@@ -86,8 +85,9 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
         pred, f = model(x_s, domain_num * domain_idx, with_ft=True)
         loss = ce_loss(pred, y_s)
         writer.add_scalar("Train Loss", loss, i)
-        loss.backward()
-        optimizer.step()
+        if (freeze):
+            loss.backward()
+            optimizer.step()
 
         if (i % 500 == 0 and i != 0):
             model, acc = test(args, model, val_dataset, domain_num)

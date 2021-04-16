@@ -237,7 +237,7 @@ def main():
             os.makedirs(save_dir, exist_ok=True)
         print('save dir: ', save_dir)
 
-        normal_train(args, teacher, trg_train, trg_val, args.iter, save_dir, args.trg_domain)
+        normal_train(args, teacher, trg_train, trg_val, args.iter, save_dir, args.trg_domain, freeze=True)
 
     else:
         print('teacher2 exists: ', t2_path)
