@@ -209,7 +209,7 @@ def main():
     teacher = get_model(args.model_name, 65, 65, 4, pretrained=True)
 
     t2_path = join(t_path, 'stage2/best_model.ckpt')
-    if not os.path.isfile(t2_path) and args.train_teacher:
+    if not os.path.isfile(t2_path) or args.train_teacher:
         print('train teacher2 ')
 
         t1_path = join(t_path, 'stage1/best_model.ckpt')
