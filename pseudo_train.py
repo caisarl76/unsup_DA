@@ -213,7 +213,7 @@ def main():
         print('train teacher2 ')
 
         t1_path = join(t_path, 'stage1/best_model.ckpt')
-        if os.path.isfile(t1_path) and args.train_teacher:
+        if os.path.isfile(t1_path):
             print('teacher1 exists')
             teacher.load_state_dict(torch.load(t1_path)['model'])
         else:
