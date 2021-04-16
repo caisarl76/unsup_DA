@@ -37,6 +37,7 @@ def parse_args(args=None, namespace=None):
     parser.add_argument('--src-domain', help='source training dataset', default='Clipart')
 
     parser.add_argument('--proceed', help='proceed to train student', action='store_true')
+    parser.add_argument('--train-teacher', help='train teacher from scratch', action='store_true')
 
 
     parser.add_argument('--num-workers', help='number of worker to load data', default=5, type=int)
@@ -208,15 +209,15 @@ def main():
     teacher = get_model(args.model_name, 65, 65, 4, pretrained=True)
 
     t2_path = join(t_path, 'stage2/best_model.ckpt')
-    if not os.path.isfile(t2_path):
-        print('teacher2 not exists')
+    if not os.path.isfile(t2_path) and args.train_teacher:
+        print('train teacher2 ')
 
         t1_path = join(t_path, 'stage1/best_model.ckpt')
-        if os.path.isfile(t1_path):
+        if os.path.isfile(t1_path) and args.train_teacher:
             print('teacher1 exists')
             teacher.load_state_dict(torch.load(t1_path)['model'])
         else:
-            print('teacher1 not exists')
+            print('train teacher1')
             save_dir = join(save_root, args.save_dir, 'teacher/stage1')
             if not os.path.isdir(save_dir):
                 os.makedirs(save_dir, exist_ok=True)
@@ -225,10 +226,11 @@ def main():
 
         bn_name = 'bns.' + (str)(domain_dict[trg_train.domain[0]])
         for name, p in teacher.named_parameters():
-            if bn_name in name:
-                p.requires_grad = True
-            else:
-                p.requires_grad = False
+            p.requires_grad = False
+            # if bn_name in name:
+            #     p.requires_grad = True
+            # else:
+            #     p.requires_grad = False
 
         save_dir = join(save_root, args.save_dir, 'teacher/stage2')
         if not os.path.isdir(save_dir):
