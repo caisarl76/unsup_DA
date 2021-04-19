@@ -199,7 +199,7 @@ def main():
     trg_val = OFFICEHOME_multi(args.data_root, 1, [args.trg_domain], split='val')
 
     ###################### train teacher model ######################
-    t_path = join(args.teacher_root, '%s_%s/' % (args.trg_domain, args.src_domain))
+    t_path = join(args.teacher_root, '%s_%s/' % (args.trg_domain[0], args.src_domain[0]))
 
     if (args.save_root):
         save_root = args.save_root
@@ -211,36 +211,36 @@ def main():
     if not os.path.isfile(t2_path) or args.train_teacher:
         print('train teacher2 ')
 
-    t1_path = join(t_path, 'stage1/best_model.ckpt')
-    if os.path.isfile(t1_path):
-        print('teacher1 exists: ', t1_path)
-    teacher.load_state_dict(torch.load(t1_path)['model'])
+        t1_path = join(t_path, 'stage1/best_model.ckpt')
+        if os.path.isfile(t1_path):
+            print('teacher1 exists: ', t1_path)
+            teacher.load_state_dict(torch.load(t1_path)['model'])
+        else:
+            print('train teacher1')
+            save_dir = join(save_root, args.save_dir, 'teacher/stage1')
+            if not os.path.isdir(save_dir):
+                os.makedirs(save_dir, exist_ok=True)
+            print('save dir: ', save_dir)
+            teacher = normal_train(args, teacher, src_train, src_val, args.iters[0], save_dir, args.src_domain)
+
+        bn_name = 'bns.' + (str)(domain_dict[trg_train.domain[0]])
+        for name, p in teacher.named_parameters():
+            p.requires_grad = False
+            # if bn_name in name:
+            #     p.requires_grad = True
+            # else:
+            #     p.requires_grad = False
+
+        save_dir = join(save_root, args.save_dir, 'teacher/stage2')
+        if not os.path.isdir(save_dir):
+            os.makedirs(save_dir, exist_ok=True)
+        print('save dir: ', save_dir)
+
+        normal_train(args, teacher, trg_train, trg_val, args.iter, save_dir, args.trg_domain, freeze=True)
+
     else:
-    print('train teacher1')
-    save_dir = join(save_root, args.save_dir, 'teacher/stage1')
-    if not os.path.isdir(save_dir):
-        os.makedirs(save_dir, exist_ok=True)
-    print('save dir: ', save_dir)
-    teacher = normal_train(args, teacher, src_train, src_val, args.iters[0], save_dir, args.src_domain)
-
-    bn_name = 'bns.' + (str)(domain_dict[trg_train.domain[0]])
-    for name, p in teacher.named_parameters():
-        p.requires_grad = False
-    # if bn_name in name:
-    #     p.requires_grad = True
-    # else:
-    #     p.requires_grad = False
-
-    save_dir = join(save_root, args.save_dir, 'teacher/stage2')
-    if not os.path.isdir(save_dir):
-        os.makedirs(save_dir, exist_ok=True)
-    print('save dir: ', save_dir)
-
-    normal_train(args, teacher, trg_train, trg_val, args.iter, save_dir, args.trg_domain, freeze=True)
-
-    else:
-    print('teacher2 exists: ', t2_path)
-    teacher.load_state_dict(torch.load(t2_path)['model'])
+        print('teacher2 exists: ', t2_path)
+        teacher.load_state_dict(torch.load(t2_path)['model'])
 
     ###################### train student model ######################
     save_dir = join(save_root, args.save_dir, 'student/stage1')
@@ -252,5 +252,5 @@ def main():
 
     ps_train(args, teacher, student, trg_train, trg_val, save_dir, args.trg_domain)
 
-    if __name__ == '__main__':
-        main()
+if __name__ == '__main__':
+    main()
