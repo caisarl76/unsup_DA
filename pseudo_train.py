@@ -205,7 +205,7 @@ def main():
         save_root = args.save_root
     torch.cuda.set_device(args.gpu)
 
-    teacher = get_model(args.model_name, 65, 65, 4, pretrained=True)
+    teacher = get_model(args.model_name, 0, 65, 4, pretrained=True)
 
     t2_path = join(t_path, 'stage2/best_resnet50dsbn+None+i0_%s2%s.pth' % (args.trg_domain, args.src_domain))
     if not os.path.isfile(t2_path) or args.train_teacher:
