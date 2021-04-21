@@ -257,6 +257,9 @@ def main():
         os.makedirs(save_dir, exist_ok=True)
     print('save dir: ', save_dir)
 
+    for name, p in teacher.named_parameters():
+        p.requires_grad = False
+
     student = get_model(args.model_name, 65, 65, 4, pretrained=True)
     #################################### STAGE 1 ####################################
     student = ps_train(args, teacher, student, trg_train, trg_val, save_dir, args.trg_domain)
