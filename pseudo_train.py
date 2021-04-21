@@ -42,7 +42,8 @@ def parse_args(args=None, namespace=None):
 
     parser.add_argument('--num-workers', help='number of worker to load data', default=5, type=int)
     parser.add_argument('--batch-size', help='batch_size', default=10, type=int)
-    parser.add_argument("--iters", type=int, default=[30050, 10050], help="choose gpu device.", nargs='+')
+    # parser.add_argument("--iters", type=int, default=[30050, 10050], help="choose gpu device.", nargs='+')
+    parser.add_argument("--iters", type=int, default=[550, 550], help="choose gpu device.", nargs='+')
     parser.add_argument("--iter", type=int, default=30000, help="iteration for teacher training.")
     parser.add_argument("--gpu", type=int, default=0, help="choose gpu device.")
 
@@ -145,7 +146,9 @@ def ps_train(args, teacher, student, train_dataset, val_dataset, save_dir, domai
 
         domain_idx = torch.ones(x_s.shape[0], dtype=torch.long).cuda(args.gpu)
         pred_y = student(x_s, domain_num * domain_idx, with_ft=False)
-        p_y = teacher(x_s, domain_num * domain_idx, with_ft=False)
+        # default number 1 for original dsbn implementation
+        # 0:src 1: trg
+        p_y = teacher(x_s, 1 * domain_idx, with_ft=False)
         # print(type(student), type(domain_num), type(domain_idx), type(x_s))
 
         loss = ce_loss(pred_y, p_y.argmax(axis=1))
