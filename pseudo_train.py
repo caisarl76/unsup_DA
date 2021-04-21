@@ -42,9 +42,9 @@ def parse_args(args=None, namespace=None):
 
     parser.add_argument('--num-workers', help='number of worker to load data', default=5, type=int)
     parser.add_argument('--batch-size', help='batch_size', default=10, type=int)
-    # parser.add_argument("--iters", type=int, default=[30050, 10050], help="choose gpu device.", nargs='+')
-    parser.add_argument("--iters", type=int, default=[550, 550], help="choose gpu device.", nargs='+')
-    parser.add_argument("--iter", type=int, default=550, help="iteration for teacher training.")
+    parser.add_argument("--iters", type=int, default=[30050, 10050], help="choose gpu device.", nargs='+')
+    # parser.add_argument("--iters", type=int, default=[550, 550], help="choose gpu device.", nargs='+')
+    # parser.add_argument("--iter", type=int, default=550, help="iteration for teacher training.")
     parser.add_argument("--gpu", type=int, default=0, help="choose gpu device.")
 
     parser.add_argument('--learning-rate', '-lr', dest='learning_rate', help='learning_rate', default=1e-3, type=float)
@@ -204,8 +204,6 @@ def main():
     trg_num = domain_dict[args.trg_domain]
 
     ###################### train teacher model ######################
-    print(args.teacher_root, args.trg_domain, args.src_domain)
-    print(join(args.teacher_root, '%s_%s/' % (args.trg_domain, args.src_domain)))
     t_path = join(args.teacher_root, '%s_%s/' % (args.trg_domain, args.src_domain))
 
     if (args.save_root):
@@ -243,7 +241,7 @@ def main():
             os.makedirs(save_dir, exist_ok=True)
         print('save dir: ', save_dir)
 
-        normal_train(args, teacher, trg_train, trg_val, args.iter, save_dir, args.trg_domain, freeze=True)
+        normal_train(args, teacher, trg_train, trg_val, args.iters[1], save_dir, args.trg_domain, freeze=True)
 
     else:
         print('teacher2 exists: ', t2_path)
