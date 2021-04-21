@@ -182,7 +182,7 @@ def ps_train(args, teacher, student, train_dataset, val_dataset, save_dir, domai
     writer.flush()
     writer.close()
 
-    return
+    return student
 
 
 def main():
@@ -199,7 +199,7 @@ def main():
     trg_val = OFFICEHOME_multi(args.data_root, 1, [args.trg_domain], split='val')
 
     ###################### train teacher model ######################
-    t_path = join(args.teacher_root, '%s_%s/' % (args.trg_domain[0], args.src_domain[0]))
+    t_path = join(args.teacher_root, '%s_%s/' % (args.trg_domain, args.src_domain))
 
     if (args.save_root):
         save_root = args.save_root
@@ -207,7 +207,7 @@ def main():
 
     teacher = get_model(args.model_name, 65, 65, 4, pretrained=True)
 
-    t2_path = join(t_path, 'stage2/best_model.ckpt')
+    t2_path = join(t_path, 'stage2/best_resnet50dsbn+None+i0_%s2%s.pth' % (args.trg_domain, args.src_domain))
     if not os.path.isfile(t2_path) or args.train_teacher:
         print('train teacher2 ')
 
@@ -249,8 +249,19 @@ def main():
     print('save dir: ', save_dir)
 
     student = get_model(args.model_name, 65, 65, 4, pretrained=True)
+    #################################### STAGE 1 ####################################
+    student = ps_train(args, teacher, student, trg_train, trg_val, save_dir, args.trg_domain)
 
-    ps_train(args, teacher, student, trg_train, trg_val, save_dir, args.trg_domain)
+    #################################### STAGE 2 ####################################
+    student = normal_train(args, student, src_train, src_val, args.iters[1])
+
+    #################################### STAGE 2 ####################################
+    trg_num = domain_dict[args.trg_domain]
+    _, stage3_acc = test(args, student, trg_val, trg_num)
+    print('####################################')
+    print('### stage 3 accuracy: %0.3f' % (stage3_acc))
+    print('####################################')
+
 
 if __name__ == '__main__':
     main()
