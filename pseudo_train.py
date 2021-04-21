@@ -77,6 +77,8 @@ def ps_test(args, teacher, student, val_dataset, domain_num):
             x_val = x_val.cuda(args.gpu)
             y_val = y_val.cuda(args.gpu)
 
+            # default number 1 for original dsbn implementation
+            # 0:src 1: trg
             pseu_y = teacher(x_val, 1 * torch.ones_like(y_val), with_ft=False).argmax(axis=1)
             pred_y = student(x_val, domain_num * torch.ones_like(y_val), with_ft=False)
             pseu_ys.append(pseu_y.cpu())
