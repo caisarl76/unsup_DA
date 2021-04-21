@@ -272,7 +272,7 @@ def main():
 
     student = normal_train(args, student, src_train, src_val, args.iters[1], save_dir, args.src_domain)
 
-    #################################### STAGE 2 ####################################
+    #################################### STAGE 3 ####################################
 
     _, stage3_acc = test(args, student, trg_val, trg_num)
     print('####################################')
