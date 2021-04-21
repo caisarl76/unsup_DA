@@ -44,7 +44,7 @@ def parse_args(args=None, namespace=None):
     parser.add_argument('--batch-size', help='batch_size', default=10, type=int)
     # parser.add_argument("--iters", type=int, default=[30050, 10050], help="choose gpu device.", nargs='+')
     parser.add_argument("--iters", type=int, default=[550, 550], help="choose gpu device.", nargs='+')
-    parser.add_argument("--iter", type=int, default=30000, help="iteration for teacher training.")
+    parser.add_argument("--iter", type=int, default=550, help="iteration for teacher training.")
     parser.add_argument("--gpu", type=int, default=0, help="choose gpu device.")
 
     parser.add_argument('--learning-rate', '-lr', dest='learning_rate', help='learning_rate', default=1e-3, type=float)
@@ -133,7 +133,7 @@ def ps_train(args, teacher, student, train_dataset, val_dataset, save_dir, domai
     best_mean_val_accuracies = []
     best_total_val_accuracies = []
 
-    for i in range(args.iter):
+    for i in range(args.iters[0]):
         try:
             _, (x_s, y_s) = train_dataloader_iters.__next__()
         except StopIteration:
