@@ -197,9 +197,11 @@ def main():
 
     src_train = OFFICEHOME_multi(args.data_root, 1, [args.src_domain], split='train')
     src_val = OFFICEHOME_multi(args.data_root, 1, [args.src_domain], split='val')
+    src_num = domain_dict[args.src_domain]
 
     trg_train = OFFICEHOME_multi(args.data_root, 1, [args.trg_domain], split='train')
     trg_val = OFFICEHOME_multi(args.data_root, 1, [args.trg_domain], split='val')
+    trg_num = domain_dict[args.trg_domain]
 
     ###################### train teacher model ######################
     t_path = join(args.teacher_root, '%s_%s/' % (args.trg_domain, args.src_domain))
@@ -261,10 +263,17 @@ def main():
         os.makedirs(save_dir, exist_ok=True)
     print('save dir: ', save_dir)
 
+    bn_name = 'bns.' + (str)(src_num)
+    for name, p in student.named_parameters():
+        if ('fc' in name) or bn_name in name:
+            p.requires_grad = True
+        else:
+            p.requires_grad = False
+
     student = normal_train(args, student, src_train, src_val, args.iters[1], save_dir, args.src_domain)
 
     #################################### STAGE 2 ####################################
-    trg_num = domain_dict[args.trg_domain]
+
     _, stage3_acc = test(args, student, trg_val, trg_num)
     print('####################################')
     print('### stage 3 accuracy: %0.3f' % (stage3_acc))
