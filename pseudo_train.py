@@ -261,7 +261,7 @@ def main():
         os.makedirs(save_dir, exist_ok=True)
     print('save dir: ', save_dir)
 
-    student = normal_train(args, student, src_train, src_val, args.iters[1], save_dir)
+    student = normal_train(args, student, src_train, src_val, args.iters[1], save_dir, args.src_domain)
 
     #################################### STAGE 2 ####################################
     trg_num = domain_dict[args.trg_domain]
