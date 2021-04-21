@@ -256,7 +256,12 @@ def main():
     student = ps_train(args, teacher, student, trg_train, trg_val, save_dir, args.trg_domain)
 
     #################################### STAGE 2 ####################################
-    student = normal_train(args, student, src_train, src_val, args.iters[1])
+    save_dir = join(save_root, args.save_dir, 'student/stage2')
+    if not os.path.isdir(save_dir):
+        os.makedirs(save_dir, exist_ok=True)
+    print('save dir: ', save_dir)
+
+    student = normal_train(args, student, src_train, src_val, args.iters[1], save_dir)
 
     #################################### STAGE 2 ####################################
     trg_num = domain_dict[args.trg_domain]
