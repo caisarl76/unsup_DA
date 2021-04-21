@@ -204,6 +204,8 @@ def main():
     trg_num = domain_dict[args.trg_domain]
 
     ###################### train teacher model ######################
+    print(args.teacher_root, args.trg_domain, args.src_domain)
+    print(join(args.teacher_root, '%s_%s/' % (args.trg_domain, args.src_domain)))
     t_path = join(args.teacher_root, '%s_%s/' % (args.trg_domain, args.src_domain))
 
     if (args.save_root):
