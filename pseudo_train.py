@@ -297,7 +297,7 @@ def main():
 
         _, stage3_acc = test(args, student, trg_val, trg_num)
         print('####################################')
-        print('### stage 3 at st1 iter:', i, '||  %0.3f' % (stage3_acc))
+        print('### stage 3 at stage1 iter:', i, '||  %0.3f' % (stage3_acc))
         print('####################################')
 
 
