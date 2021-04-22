@@ -43,7 +43,7 @@ def parse_args(args=None, namespace=None):
 
     parser.add_argument('--num-workers', help='number of worker to load data', default=5, type=int)
     parser.add_argument('--batch-size', help='batch_size', default=10, type=int)
-    parser.add_argument("--iters", type=int, default=[30050, 10050], help="choose gpu device.", nargs='+')
+    parser.add_argument("--iters", type=int, default=[20050, 10050], help="choose gpu device.", nargs='+')
     # parser.add_argument("--iters", type=int, default=[2050, 550], help="choose gpu device.", nargs='+')
     # parser.add_argument("--iter", type=int, default=550, help="iteration for teacher training.")
     parser.add_argument("--gpu", type=int, default=0, help="choose gpu device.")
@@ -301,16 +301,27 @@ def main():
             _, stage3_acc = test(args, student, trg_val, trg_num)
             print('####################################')
             print('### stage 3 at stage1 iter:', i, '||  %0.3f' % (stage3_acc))
-        print('####################################')
+            print('####################################')
 
     save_dir = join(save_root, args.save_dir, 'student/stage2')
     if not os.path.isdir(save_dir):
         os.makedirs(save_dir, exist_ok=True)
     print('save dir: ', save_dir)
 
-    bn_name = 'bns.' + (str)(src_num)
+    src_bn = 'bns.' + (str)(src_num)
+    trg_bn = 'bns.' + (str)(trg_num)
+
+    weight_dict = OrderedDict()
     for name, p in student.named_parameters():
-        if ('fc' in name) or bn_name in name:
+        if (src_bn in name):
+            new_name = name.replace(src_bn, trg_bn)
+            weight_dict[new_name] = p
+
+    student.load_state_dict(weight_dict, strict=False)
+    del weight_dict
+
+    for name, p in student.named_parameters():
+        if ('fc' in name) or src_bn in name:
             p.requires_grad = True
         else:
             p.requires_grad = False
@@ -321,7 +332,7 @@ def main():
 
     _, stage3_acc = test(args, student, trg_val, trg_num)
     print('####################################')
-    print('### stage 3 at stage1 iter:', i, '||  %0.3f' % (stage3_acc))
+    print('### stage 3 at stage1 iter: best', '||  %0.3f' % (stage3_acc))
     print('####################################')
 
 if __name__ == '__main__':
