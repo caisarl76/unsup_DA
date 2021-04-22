@@ -91,7 +91,7 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
 
         if (i % 500 == 0 and i != 0):
             model, acc = test(args, model, val_dataset, domain_num)
-            print('%d iter || val acc: %0.3f' % (i, acc))
+            # print('%d iter || val acc: %0.3f' % (i, acc))
             writer.add_scalar("Val Accuracy", acc, i)
             if acc > best_accuracy:
                 best_accuracy = acc
@@ -101,7 +101,7 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
                 # save best checkpoint
                 io_utils.save_check(save_dir, i, model_dict, optimizer_dict, best=True)
             if (i % 10000 == 0 and i != 0):
-                print('%d iter complete' % (i))
+                print('%d iter accuracy: %0.3f' % (i, acc))
 
             model.train(True)
             model = model.cuda(args.gpu)

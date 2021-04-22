@@ -23,7 +23,7 @@ from utils import io_utils, eval_utils
 root = '/media/hd/jihun/dsbn_result/new/'
 
 domain_dict = {'RealWorld': 0, 'Art': 1, 'Clipart': 2, 'Product': 3}
-interval = [500, 1000, 2000]
+interval = [5000, 10000, 20000]
 
 def parse_args(args=None, namespace=None):
     parser = argparse.ArgumentParser()
@@ -42,8 +42,8 @@ def parse_args(args=None, namespace=None):
 
     parser.add_argument('--num-workers', help='number of worker to load data', default=5, type=int)
     parser.add_argument('--batch-size', help='batch_size', default=10, type=int)
-    # parser.add_argument("--iters", type=int, default=[30050, 10050], help="choose gpu device.", nargs='+')
-    parser.add_argument("--iters", type=int, default=[2050, 550], help="choose gpu device.", nargs='+')
+    parser.add_argument("--iters", type=int, default=[30050, 10050], help="choose gpu device.", nargs='+')
+    # parser.add_argument("--iters", type=int, default=[2050, 550], help="choose gpu device.", nargs='+')
     # parser.add_argument("--iter", type=int, default=550, help="iteration for teacher training.")
     parser.add_argument("--gpu", type=int, default=0, help="choose gpu device.")
 
