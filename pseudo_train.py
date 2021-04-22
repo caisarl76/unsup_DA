@@ -160,7 +160,7 @@ def ps_train(args, teacher, student, train_dataset, val_dataset, save_dir, domai
 
         if (i % 500 == 0 and i != 0):
             student, val_acc, student_acc = ps_test(args, teacher, student, val_dataset, domain_num)
-            print('%d iter || student acc: %0.3f, ||  val acc: %0.3f' % (i, student_acc, val_acc))
+            # print('%d iter || student acc: %0.3f, ||  val acc: %0.3f' % (i, student_acc, val_acc))
             writer.add_scalar("Val Accuracy", val_acc, i)
             writer.add_scalar("Student Accuracy", student_acc, i)
 
@@ -268,12 +268,12 @@ def main():
 
     student = get_model(args.model_name, 65, 65, 4, pretrained=True)
     #################################### STAGE 1 ####################################
-    student = ps_train(args, teacher, student, trg_train, trg_val, save_dir, args.trg_domain, args.iters[0])
+    # student = ps_train(args, teacher, student, trg_train, trg_val, save_dir, args.trg_domain, args.iters[0])
 
     #################################### STAGE 2 ####################################
-    nums = [5000, 10000, 20000]
+
     weight_pth = {}
-    for i in nums:
+    for i in interval:
         weight_pth[i] = join(save_dir, (str)(i) + '_weight.ckpt')
     weight_pth['best'] = join(save_dir, 'best_model.ckpt')
 
