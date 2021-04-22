@@ -223,7 +223,7 @@ def main():
     # teacher for our custum dsbn
     teacher = get_model(args.model_name, num_classes=65, in_features=65, num_domains=4, pretrained=True)
     t_path = join(args.teacher_root, '%s_%s/' % (args.src_domain, args.trg_domain))
-    t2_path = join(t_path, 'stage2/best_model.ckpt')
+    t2_path = join(t_path, 'teacher/stage2/best_model.ckpt')
 
     if (args.teacher_original):
         # teacher for original dsbn
