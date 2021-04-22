@@ -213,19 +213,21 @@ def main():
     trg_num = domain_dict[args.trg_domain]
 
     ###################### train teacher model ######################
-    # t_path = join(args.teacher_root, '%s_%s/' % (args.src_domain, args.trg_domain))
-    t_path = join(args.teacher_root, '%s_%s/' % (args.src_domain[0].lower(), args.trg_domain[0].lower()))
     if (args.save_root):
         save_root = args.save_root
     torch.cuda.set_device(args.gpu)
 
     # teacher for original dsbn
     # teacher = get_model(args.model_name, num_classes=65, in_features=0, num_domains=2, pretrained=True)
+    # t_path = join(args.teacher_root, '%s_%s/' % (args.src_domain, args.trg_domain))
+    # t2_path = join(t_path, 'stage2/best_resnet50dsbn+None+i0_%s2%s.pth' % (args.src_domain, args.trg_domain))
 
     # teacher for our custum dsbn
     teacher = get_model(args.model_name, num_classes=65, in_features=65, num_domains=4, pretrained=True)
-    # t2_path = join(t_path, 'stage2/best_resnet50dsbn+None+i0_%s2%s.pth' % (args.src_domain, args.trg_domain))
+    t_path = join(args.teacher_root, '%s_%s/' % (args.src_domain, args.trg_domain))
     t2_path = join(t_path, 'stage2/best_model.ckpt')
+
+
     print(t2_path)
     # if not os.path.isfile(t2_path) or args.train_teacher:
     if not os.path.isfile(t2_path):
@@ -243,13 +245,8 @@ def main():
             print('save dir: ', save_dir)
             teacher = normal_train(args, teacher, src_train, src_val, args.iters[0], save_dir, args.src_domain)
 
-        bn_name = 'bns.' + (str)(domain_dict[trg_train.domain[0]])
         for name, p in teacher.named_parameters():
             p.requires_grad = False
-            # if bn_name in name:
-            #     p.requires_grad = True
-            # else:
-            #     p.requires_grad = False
 
         save_dir = join(save_root, args.save_dir, 'teacher/stage2')
         if not os.path.isdir(save_dir):
