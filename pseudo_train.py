@@ -39,7 +39,9 @@ def parse_args(args=None, namespace=None):
     parser.add_argument('--interval', help='experiment on stage1 intervals', action='store_true')
     parser.add_argument('--proceed', help='proceed to train student', action='store_true')
     parser.add_argument('--train-teacher', help='train teacher from scratch', action='store_true')
+    parser.add_argument('--teacher-original', help='teacher model is DSBN original', action='store_true')
     parser.add_argument('--teacher-root', help='path where teacher model exists', type=str)
+
 
     parser.add_argument('--num-workers', help='number of worker to load data', default=5, type=int)
     parser.add_argument('--batch-size', help='batch_size', default=10, type=int)
@@ -217,16 +219,17 @@ def main():
         save_root = args.save_root
     torch.cuda.set_device(args.gpu)
 
-    # teacher for original dsbn
-    # teacher = get_model(args.model_name, num_classes=65, in_features=0, num_domains=2, pretrained=True)
-    # t_path = join(args.teacher_root, '%s_%s/' % (args.src_domain, args.trg_domain))
-    # t2_path = join(t_path, 'stage2/best_resnet50dsbn+None+i0_%s2%s.pth' % (args.src_domain, args.trg_domain))
 
     # teacher for our custum dsbn
     teacher = get_model(args.model_name, num_classes=65, in_features=65, num_domains=4, pretrained=True)
     t_path = join(args.teacher_root, '%s_%s/' % (args.src_domain, args.trg_domain))
     t2_path = join(t_path, 'stage2/best_model.ckpt')
 
+    if (args.teacher_original):
+        # teacher for original dsbn
+        teacher = get_model(args.model_name, num_classes=65, in_features=0, num_domains=2, pretrained=True)
+        t_path = join(args.teacher_root, '%s_%s/' % (args.src_domain, args.trg_domain))
+        t2_path = join(t_path, 'stage2/best_resnet50dsbn+None+i0_%s2%s.pth' % (args.src_domain, args.trg_domain))
 
     print(t2_path)
     # if not os.path.isfile(t2_path) or args.train_teacher:
