@@ -316,7 +316,7 @@ def save_check(save_dir, i_iter, model_dict, optimizer_dict, best=False):
             optimizer_dict.update({'iteration': i_iter})
             torch.save(optimizer_dict, save_path)
     else:
-        save_path = os.path.join(save_dir, '%dth_iter_weight.ckpt' % (i_iter))
+        save_path = os.path.join(save_dir, '%d_weight.ckpt' % (i_iter))
         model_dict.update({'iteration': i_iter})
         torch.save(model_dict, save_path)
         if optimizer_dict:

@@ -105,7 +105,7 @@ def ps_test(args, teacher, student, val_dataset, domain_num):
     return student, val_acc, student_acc
 
 
-def ps_train(args, teacher, student, train_dataset, val_dataset, save_dir, domain):
+def ps_train(args, teacher, student, train_dataset, val_dataset, save_dir, domain, iter):
     train_dataloader = util_data.DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True,
                                             num_workers=args.num_workers, drop_last=True, pin_memory=True)
     train_dataloader_iters = enumerate(train_dataloader)
@@ -135,7 +135,7 @@ def ps_train(args, teacher, student, train_dataset, val_dataset, save_dir, domai
     best_mean_val_accuracies = []
     best_total_val_accuracies = []
 
-    for i in range(args.iters[0]):
+    for i in range(iter):
         try:
             _, (x_s, y_s) = train_dataloader_iters.__next__()
         except StopIteration:
@@ -178,8 +178,14 @@ def ps_train(args, teacher, student, train_dataset, val_dataset, save_dir, domai
                 # save best checkpoint
                 io_utils.save_check(save_dir, i, model_dict, optimizer_dict, best=True)
 
-            if (i % 10000 == 0 and i != 0):
-                print('%d iter complete' % (i))
+            # if (i % 10000 == 0 and i != 0):
+            #     print('%d iter complete' % (i))
+            if i in [5000, 10000, 20000]:
+                print('%d iter student acc: %0.3f, || val acc: %0.3f' % (i, student_acc, val_acc))
+                model_dict = {'model': student.cpu().state_dict()}
+                optimizer_dict = {'optimizer': optimizer.state_dict()}
+                # save best checkpoint
+                io_utils.save_check(save_dir, i, model_dict, optimizer_dict, best=True)
 
             student.train(True)
             student = student.cuda(args.gpu)
@@ -262,29 +268,37 @@ def main():
 
     student = get_model(args.model_name, 65, 65, 4, pretrained=True)
     #################################### STAGE 1 ####################################
-    student = ps_train(args, teacher, student, trg_train, trg_val, save_dir, args.trg_domain)
+    student = ps_train(args, teacher, student, trg_train, trg_val, save_dir, args.trg_domain, args.iters[0])
 
     #################################### STAGE 2 ####################################
-    save_dir = join(save_root, args.save_dir, 'student/stage2')
-    if not os.path.isdir(save_dir):
-        os.makedirs(save_dir, exist_ok=True)
-    print('save dir: ', save_dir)
+    nums = [5000, 10000, 20000]
+    weight_pth = {}
+    for i in nums:
+        weight_pth[i] = join(save_dir, (str)(i) + '_weight.ckpt')
+    weight_pth['best'] = join(save_dir, 'best_model.ckpt')
 
-    bn_name = 'bns.' + (str)(src_num)
-    for name, p in student.named_parameters():
-        if ('fc' in name) or bn_name in name:
-            p.requires_grad = True
-        else:
-            p.requires_grad = False
+    for i in weight_pth.keys():
+        save_dir = join(save_root, args.save_dir, 'student/stage2/', (str)(i))
+        if not os.path.isdir(save_dir):
+            os.makedirs(save_dir, exist_ok=True)
+        print('save dir: ', save_dir)
+        student.load_state_dict(torch.load(weight_pth[i])['model'])
 
-    student = normal_train(args, student, src_train, src_val, args.iters[1], save_dir, args.src_domain)
+        bn_name = 'bns.' + (str)(src_num)
+        for name, p in student.named_parameters():
+            if ('fc' in name) or bn_name in name:
+                p.requires_grad = True
+            else:
+                p.requires_grad = False
 
-    #################################### STAGE 3 ####################################
+        student = normal_train(args, student, src_train, src_val, args.iters[1], save_dir, args.src_domain)
 
-    _, stage3_acc = test(args, student, trg_val, trg_num)
-    print('####################################')
-    print('### stage 3 accuracy: %0.3f' % (stage3_acc))
-    print('####################################')
+        #################################### STAGE 3 ####################################
+
+        _, stage3_acc = test(args, student, trg_val, trg_num)
+        print('####################################')
+        print('### stage 3 at st1 iter:', i, '||  %0.3f' % (stage3_acc))
+        print('####################################')
 
 
 if __name__ == '__main__':
