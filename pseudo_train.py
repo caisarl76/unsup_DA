@@ -219,7 +219,10 @@ def main():
         save_root = args.save_root
     torch.cuda.set_device(args.gpu)
 
+    # teacher for original dsbn
     # teacher = get_model(args.model_name, num_classes=65, in_features=0, num_domains=2, pretrained=True)
+
+    # teacher for our custum dsbn
     teacher = get_model(args.model_name, num_classes=65, in_features=65, num_domains=4, pretrained=True)
     # t2_path = join(t_path, 'stage2/best_resnet50dsbn+None+i0_%s2%s.pth' % (args.src_domain, args.trg_domain))
     t2_path = join(t_path, 'stage2/best_model.ckpt')
