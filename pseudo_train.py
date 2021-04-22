@@ -185,7 +185,7 @@ def ps_train(args, teacher, student, train_dataset, val_dataset, save_dir, domai
                 model_dict = {'model': student.cpu().state_dict()}
                 optimizer_dict = {'optimizer': optimizer.state_dict()}
                 # save best checkpoint
-                io_utils.save_check(save_dir, i, model_dict, optimizer_dict, best=True)
+                io_utils.save_check(save_dir, i, model_dict, optimizer_dict, best=False)
 
             student.train(True)
             student = student.cuda(args.gpu)
@@ -268,7 +268,7 @@ def main():
 
     student = get_model(args.model_name, 65, 65, 4, pretrained=True)
     #################################### STAGE 1 ####################################
-    # student = ps_train(args, teacher, student, trg_train, trg_val, save_dir, args.trg_domain, args.iters[0])
+    student = ps_train(args, teacher, student, trg_train, trg_val, save_dir, args.trg_domain, args.iters[0])
 
     #################################### STAGE 2 ####################################
 
