@@ -218,14 +218,14 @@ def main():
     torch.cuda.set_device(args.gpu)
 
     # teacher for original dsbn
-    teacher = get_model(args.model_name, num_classes=65, in_features=0, num_domains=2, pretrained=True)
-    t_path = join(args.teacher_root, '%s_%s/' % (args.src_domain, args.trg_domain))
-    t2_path = join(t_path, 'stage2/best_resnet50dsbn+None+i0_%s2%s.pth' % (args.src_domain, args.trg_domain))
+    # teacher = get_model(args.model_name, num_classes=65, in_features=0, num_domains=2, pretrained=True)
+    # t_path = join(args.teacher_root, '%s_%s/' % (args.src_domain, args.trg_domain))
+    # t2_path = join(t_path, 'stage2/best_resnet50dsbn+None+i0_%s2%s.pth' % (args.src_domain, args.trg_domain))
 
     # teacher for our custum dsbn
-    # teacher = get_model(args.model_name, num_classes=65, in_features=65, num_domains=4, pretrained=True)
-    # t_path = join(args.teacher_root, '%s_%s/' % (args.src_domain, args.trg_domain))
-    # t2_path = join(t_path, 'stage2/best_model.ckpt')
+    teacher = get_model(args.model_name, num_classes=65, in_features=65, num_domains=4, pretrained=True)
+    t_path = join(args.teacher_root, '%s_%s/' % (args.src_domain, args.trg_domain))
+    t2_path = join(t_path, 'stage2/best_model.ckpt')
 
 
     print(t2_path)
@@ -321,7 +321,7 @@ def main():
     del weight_dict
 
     for name, p in student.named_parameters():
-        if ('fc' in name) or src_bn in name:
+        if ('fc' in name) or (src_bn in name):
             p.requires_grad = True
         else:
             p.requires_grad = False
