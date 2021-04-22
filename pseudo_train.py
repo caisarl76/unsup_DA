@@ -36,6 +36,7 @@ def parse_args(args=None, namespace=None):
     parser.add_argument('--trg-domain', help='target training dataset', default='Clipart')
     parser.add_argument('--src-domain', help='source training dataset', default='Clipart')
 
+    parser.add_argument('--interval', help='experiment on stage1 intervals', action='store_true')
     parser.add_argument('--proceed', help='proceed to train student', action='store_true')
     parser.add_argument('--train-teacher', help='train teacher from scratch', action='store_true')
     parser.add_argument('--teacher-root', help='path where teacher model exists', type=str)
@@ -180,7 +181,7 @@ def ps_train(args, teacher, student, train_dataset, val_dataset, save_dir, domai
 
             # if (i % 10000 == 0 and i != 0):
             #     print('%d iter complete' % (i))
-            if i in interval:
+            if args.interval and i in interval:
                 print('%d iter student acc: %0.3f, || val acc: %0.3f' % (i, student_acc, val_acc))
                 model_dict = {'model': student.cpu().state_dict()}
                 optimizer_dict = {'optimizer': optimizer.state_dict()}
@@ -212,15 +213,16 @@ def main():
     trg_num = domain_dict[args.trg_domain]
 
     ###################### train teacher model ######################
-    t_path = join(args.teacher_root, '%s_%s/' % (args.src_domain, args.trg_domain))
-
+    # t_path = join(args.teacher_root, '%s_%s/' % (args.src_domain, args.trg_domain))
+    t_path = join(args.teacher_root, '%s_%s/' % (args.src_domain[0].lower(), args.trg_domain[0].lower()))
     if (args.save_root):
         save_root = args.save_root
     torch.cuda.set_device(args.gpu)
 
     teacher = get_model(args.model_name, num_classes=65, in_features=0, num_domains=2, pretrained=True)
 
-    t2_path = join(t_path, 'stage2/best_resnet50dsbn+None+i0_%s2%s.pth' % (args.src_domain, args.trg_domain))
+    # t2_path = join(t_path, 'stage2/best_resnet50dsbn+None+i0_%s2%s.pth' % (args.src_domain, args.trg_domain))
+    t2_path = join(t_path, 'stage2/best_model.ckpt')
     print(t2_path)
     # if not os.path.isfile(t2_path) or args.train_teacher:
     if not os.path.isfile(t2_path):
@@ -273,33 +275,54 @@ def main():
     #################################### STAGE 2 ####################################
 
     weight_pth = {}
-    for i in interval:
-        weight_pth[i] = join(save_dir, (str)(i) + '_weight.ckpt')
-    weight_pth['best'] = join(save_dir, 'best_model.ckpt')
+    if(args.interval):
+        for i in interval:
+            weight_pth[i] = join(save_dir, (str)(i) + '_weight.ckpt')
+        weight_pth['best'] = join(save_dir, 'best_model.ckpt')
 
-    for i in weight_pth.keys():
-        save_dir = join(save_root, args.save_dir, 'student/stage2/', (str)(i))
-        if not os.path.isdir(save_dir):
-            os.makedirs(save_dir, exist_ok=True)
-        print('save dir: ', save_dir)
-        student.load_state_dict(torch.load(weight_pth[i])['model'])
+        for i in weight_pth.keys():
+            save_dir = join(save_root, args.save_dir, 'student/stage2/', (str)(i))
+            if not os.path.isdir(save_dir):
+                os.makedirs(save_dir, exist_ok=True)
+            print('save dir: ', save_dir)
+            student.load_state_dict(torch.load(weight_pth[i])['model'])
 
-        bn_name = 'bns.' + (str)(src_num)
-        for name, p in student.named_parameters():
-            if ('fc' in name) or bn_name in name:
-                p.requires_grad = True
-            else:
-                p.requires_grad = False
+            bn_name = 'bns.' + (str)(src_num)
+            for name, p in student.named_parameters():
+                if ('fc' in name) or bn_name in name:
+                    p.requires_grad = True
+                else:
+                    p.requires_grad = False
 
-        student = normal_train(args, student, src_train, src_val, args.iters[1], save_dir, args.src_domain)
+            student = normal_train(args, student, src_train, src_val, args.iters[1], save_dir, args.src_domain)
 
-        #################################### STAGE 3 ####################################
+            #################################### STAGE 3 ####################################
 
-        _, stage3_acc = test(args, student, trg_val, trg_num)
+            _, stage3_acc = test(args, student, trg_val, trg_num)
+            print('####################################')
+            print('### stage 3 at stage1 iter:', i, '||  %0.3f' % (stage3_acc))
         print('####################################')
-        print('### stage 3 at stage1 iter:', i, '||  %0.3f' % (stage3_acc))
-        print('####################################')
 
+    save_dir = join(save_root, args.save_dir, 'student/stage2')
+    if not os.path.isdir(save_dir):
+        os.makedirs(save_dir, exist_ok=True)
+    print('save dir: ', save_dir)
+
+    bn_name = 'bns.' + (str)(src_num)
+    for name, p in student.named_parameters():
+        if ('fc' in name) or bn_name in name:
+            p.requires_grad = True
+        else:
+            p.requires_grad = False
+
+    student = normal_train(args, student, src_train, src_val, args.iters[1], save_dir, args.src_domain)
+
+    #################################### STAGE 3 ####################################
+
+    _, stage3_acc = test(args, student, trg_val, trg_num)
+    print('####################################')
+    print('### stage 3 at stage1 iter:', i, '||  %0.3f' % (stage3_acc))
+    print('####################################')
 
 if __name__ == '__main__':
     main()
