@@ -219,16 +219,15 @@ def main():
         save_root = args.save_root
     torch.cuda.set_device(args.gpu)
 
+    t_path = join(args.teacher_root, '%s_%s/' % (args.src_domain, args.trg_domain))
 
     # teacher for our custum dsbn
     teacher = get_model(args.model_name, num_classes=65, in_features=65, num_domains=4, pretrained=True)
-    t_path = join(args.teacher_root, '%s_%s/' % (args.src_domain, args.trg_domain))
     t2_path = join(t_path, 'teacher/stage2/best_model.ckpt')
 
     if (args.teacher_original):
         # teacher for original dsbn
         teacher = get_model(args.model_name, num_classes=65, in_features=0, num_domains=2, pretrained=True)
-        t_path = join(args.teacher_root, '%s_%s/' % (args.src_domain, args.trg_domain))
         t2_path = join(t_path, 'stage2/best_resnet50dsbn+None+i0_%s2%s.pth' % (args.src_domain, args.trg_domain))
 
     print(t2_path)
@@ -263,6 +262,7 @@ def main():
         teacher.load_state_dict(torch.load(t2_path)['model'])
 
     ###################### train student model ######################
+    #################################### STAGE 1 ####################################
     save_dir = join(save_root, args.save_dir, 'student/stage1')
     if not os.path.isdir(save_dir):
         os.makedirs(save_dir, exist_ok=True)
@@ -272,7 +272,6 @@ def main():
         p.requires_grad = False
 
     student = get_model(args.model_name, 65, 65, 4, pretrained=True)
-    #################################### STAGE 1 ####################################
     student = ps_train(args, teacher, student, trg_train, trg_val, save_dir, args.trg_domain, args.iters[0])
 
     #################################### STAGE 2 ####################################
@@ -320,6 +319,8 @@ def main():
             weight_dict[name] = p
             new_name = name.replace(src_bn, trg_bn)
             weight_dict[new_name] = p
+        elif(trg_bn in name):
+            continue
         else:
             weight_dict[name] = p
 
