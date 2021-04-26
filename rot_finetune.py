@@ -13,7 +13,7 @@ from dataset.factory import get_dataset
 from rot_dataset.rot_dataset import rot_dataset
 from model.rot_resnetdsbn import get_rot_model
 from model.factory import get_model
-from utils.train_utils import adaptation_factor, semantic_loss_calc, get_optimizer_params
+from utils.train_utils import get_optimizer_params, normal_train, test
 from utils.train_utils import LRScheduler, Monitor
 from utils import io_utils, eval_utils
 from collections import OrderedDict
@@ -79,117 +79,10 @@ def main():
     torch.nn.init.xavier_uniform_(model.fc2.weight)
 
     train_dataset = get_dataset("{}_{}_{}_{}".format(args.model_name, args.trg_domain, 'train', None))
-    train_dataloader = util_data.DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True,
-                                            num_workers=args.num_workers, drop_last=True, pin_memory=True)
-    train_dataloader_iters = enumerate(train_dataloader)
-
     val_dataset = get_dataset("{}_{}_{}_{}".format(args.model_name, args.trg_domain, 'val', None))
 
-    model.train(True)
-    model = model.cuda(args.gpu)
+    model = normal_train(args, model, train_dataset, val_dataset, args.iters, save_dir, args.trg_domain)
 
-    params = get_optimizer_params(model, args.learning_rate, weight_decay=args.weight_decay,
-                                  double_bias_lr=True, base_weight_factor=0.1)
-    optimizer = optim.Adam(params, betas=(0.9, 0.999))
-    ce_loss = nn.CrossEntropyLoss()
-    writer = SummaryWriter()
-    domain_num = domain_dict[train_dataset.domain]
-    print('domain_num, stage: ', domain_num, stage)
-
-    global best_accuracy
-    global best_accuracies_each_c
-    global best_mean_val_accuracies
-    global best_total_val_accuracies
-    best_accuracy = 0.0
-    best_accuracies_each_c = []
-    best_mean_val_accuracies = []
-    best_total_val_accuracies = []
-
-    for i in range(args.iters):
-        try:
-            _, (x_s, y_s) = train_dataloader_iters.__next__()
-        except StopIteration:
-            train_dataloader_iters = enumerate(train_dataloader)
-            _, (x_s, y_s) = train_dataloader_iters.__next__()
-
-        optimizer.zero_grad()
-
-        x_s, y_s = x_s.cuda(args.gpu), y_s.cuda(args.gpu)
-        pred, f = model(x_s, domain_num * torch.ones(x_s.shape[0], dtype=torch.long).cuda(args.gpu), with_ft=True)
-        loss = ce_loss(pred, y_s)
-        writer.add_scalar("Train Loss", loss, i)
-        loss.backward()
-        optimizer.step()
-
-        if (i % 500 == 0 and i != 0):
-            model.eval()
-            total_val_accuracies = []
-            mean_val_accuracies = []
-            val_accuracies_each_c = []
-            model.eval()
-
-            val_dataloader = util_data.DataLoader(val_dataset, batch_size=args.batch_size, shuffle=True,
-                                                  num_workers=args.num_workers, drop_last=True, pin_memory=True)
-            val_dataloader_iter = enumerate(val_dataloader)
-
-            pred_vals = []
-            y_vals = []
-            x_val = None
-            y_val = None
-
-            with torch.no_grad():
-                for j, (x_val, y_val) in val_dataloader_iter:
-                    y_vals.append(y_val.cpu())
-                    x_val = x_val.cuda(args.gpu)
-                    y_val = y_val.cuda(args.gpu)
-
-                    pred_val = model(x_val, domain_num * torch.ones_like(y_val), with_ft=False)
-
-                    pred_vals.append(pred_val.cpu())
-
-            pred_vals = torch.cat(pred_vals, 0)
-            y_vals = torch.cat(y_vals, 0)
-            total_val_accuracy = float(eval_utils.accuracy(pred_vals, y_vals, topk=(1,))[0])
-            val_accuracy_each_c = [(c_name, float(eval_utils.accuracy_of_c(pred_vals, y_vals,
-                                                                           class_idx=c, topk=(1,))[0]))
-                                   for c, c_name in enumerate(val_dataset.classes)]
-
-            mean_val_accuracy = float(
-                torch.mean(torch.FloatTensor([c_val_acc for _, c_val_acc in val_accuracy_each_c])))
-            total_val_accuracies.append(total_val_accuracy)
-            val_accuracies_each_c.append(val_accuracy_each_c)
-            mean_val_accuracies.append(mean_val_accuracy)
-
-            val_accuracy = float(torch.mean(torch.FloatTensor(total_val_accuracies)))
-            print('%d th iteration accuracy: %f ' % (i, val_accuracy))
-            del x_val, y_val, pred_val, pred_vals, y_vals
-            del val_dataloader_iter
-
-            model_dict = {'model': model.cpu().state_dict()}
-            optimizer_dict = {'optimizer': optimizer.state_dict()}
-
-            # save best checkpoint
-            io_utils.save_check(save_dir, i, model_dict, optimizer_dict, best=False)
-
-            model.train(True)  # train mode
-            if val_accuracy > best_accuracy:
-                best_accuracy = val_accuracy
-                best_accuracies_each_c = val_accuracies_each_c
-                best_mean_val_accuracies = mean_val_accuracies
-                best_total_val_accuracies = total_val_accuracies
-                # print('%d iter val acc %.3f' % (i, val_accuracy))
-                model_dict = {'model': model.cpu().state_dict()}
-                optimizer_dict = {'optimizer': optimizer.state_dict()}
-
-                # save best checkpoint
-                io_utils.save_check(save_dir, i, model_dict, optimizer_dict, best=True)
-
-            model = model.cuda(args.gpu)
-
-        if (i % 10000 == 0 and i != 0):
-            print('%d iter complete' % (i))
-    writer.flush()
-    writer.close()
 
 
 if __name__ == '__main__':
