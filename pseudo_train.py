@@ -181,8 +181,8 @@ def ps_train(args, teacher, student, train_dataset, val_dataset, save_dir, domai
                 # save best checkpoint
                 io_utils.save_check(save_dir, i, model_dict, optimizer_dict, best=True)
 
-            # if (i % 10000 == 0 and i != 0):
-            #     print('%d iter complete' % (i))
+            if (i % 10000 == 0 and i != 0):
+                print('%d iter || student acc: %0.3f, ||  val acc: %0.3f' % (i, student_acc, val_acc))
             if args.interval and i in interval:
                 print('%d iter student acc: %0.3f, || val acc: %0.3f' % (i, student_acc, val_acc))
                 model_dict = {'model': student.cpu().state_dict()}
