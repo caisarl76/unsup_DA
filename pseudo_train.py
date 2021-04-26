@@ -233,7 +233,7 @@ def main():
 
     print(t2_path)
     # if not os.path.isfile(t2_path) or args.train_teacher:
-    if not os.path.isfile(t2_path) or True:
+    if not os.path.isfile(t2_path):
         print('train teacher2 ')
 
         t1_path = join(t_path, 'stage1/best_model.ckpt')
