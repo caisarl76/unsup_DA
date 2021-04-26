@@ -315,11 +315,11 @@ def main():
 
     weight_dict = OrderedDict()
     for name, p in student.named_parameters():
-        if (src_bn in name):
+        if (trg_bn in name):
             weight_dict[name] = p
-            new_name = name.replace(src_bn, trg_bn)
+            new_name = name.replace(trg_bn, src_bn)
             weight_dict[new_name] = p
-        elif(trg_bn in name):
+        elif(src_bn in name):
             continue
         else:
             weight_dict[name] = p

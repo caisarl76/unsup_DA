@@ -14,6 +14,7 @@ from utils import io_utils, eval_utils
 
 domain_dict = {'RealWorld': 0, 'Art': 1, 'Clipart': 2, 'Product': 3}
 
+
 def test(args, model, val_dataset, domain_num):
     val_dataloader = util_data.DataLoader(val_dataset, batch_size=args.batch_size, shuffle=True,
                                           num_workers=args.num_workers, drop_last=True, pin_memory=True)
@@ -41,7 +42,6 @@ def test(args, model, val_dataset, domain_num):
     val_acc_each_c = [(c_name, float(eval_utils.accuracy_of_c(pred_ys, y_vals,
                                                               class_idx=c, topk=(1,))[0]))
                       for c, c_name in enumerate(val_dataset.classes)]
-
     return model, val_acc
 
 
@@ -100,16 +100,20 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
 
                 # save best checkpoint
                 io_utils.save_check(save_dir, i, model_dict, optimizer_dict, best=True)
-            if (i % 10000 == 0 and i != 0):
+            if (i % 1000 == 0 and i != 0):
                 print('%d iter accuracy: %0.3f' % (i, acc))
 
             model.train(True)
             model = model.cuda(args.gpu)
 
+    model, acc = test(args, model, val_dataset, domain_num)
+    print('final acc: %0.3f' % (acc))
+
     writer.flush()
     writer.close()
 
     return model
+
 
 def adaptation_factor(p, gamma=10):
     p = max(min(p, 1.0), 0.0)
