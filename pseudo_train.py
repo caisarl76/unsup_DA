@@ -317,8 +317,11 @@ def main():
     weight_dict = OrderedDict()
     for name, p in student.named_parameters():
         if (src_bn in name):
+            weight_dict[name] = p
             new_name = name.replace(src_bn, trg_bn)
             weight_dict[new_name] = p
+        else:
+            weight_dict[name] = p
 
     student.load_state_dict(weight_dict, strict=False)
     del weight_dict
