@@ -65,19 +65,12 @@ def main():
     #     pre = torch.load(join(save_root, args.save_dir, 'stage1', 'best_model.ckpt'))['model']
     # elif (not args.proceed) and (args.model_path):
     #     pre = torch.load(join(save_root, args.model_path))['model']
-    pre = torch.load(join(save_root, args.model_path))['model']
-    new_pre = OrderedDict()
+    pre = torch.load(args.model_path)['model']
 
-    for p in pre:
-        if ('fc' in p):
-            continue
-        else:
-            new_pre[p] = pre[p]
+    model.load_state_dict(pre, strict=False)
+    del pre
 
-    model.load_state_dict(new_pre, strict=False)
-    del new_pre
-
-    for p in model.parameters():
+    for p in model.named_parameters():
         p.requires_grad = False
 
     model.fc1.weight.requires_grad = True
