@@ -12,7 +12,9 @@ import torch.optim as optim
 
 from utils import io_utils, eval_utils
 
-domain_dict = {'RealWorld': 0, 'Art': 1, 'Clipart': 2, 'Product': 3}
+domain_lib = {'office-home': {'RealWorld': 0, 'Art': 1, 'Clipart': 2, 'Product': 3},
+               'domainnet': {'clipart': 0, 'infograph': 1, 'painting': 2, 'quickdraw': 3, 'real': 4, 'sketch': 5}}
+
 
 
 def test(args, model, val_dataset, domain_num):
@@ -45,7 +47,8 @@ def test(args, model, val_dataset, domain_num):
     return model, val_acc
 
 
-def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain, domain_dict=None, freeze=False):
+def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain, freeze=False):
+    domain_dict = domain_lib[args.dataset]
     train_dataloader = util_data.DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True,
                                             num_workers=args.num_workers, drop_last=True, pin_memory=True)
     train_dataloader_iters = enumerate(train_dataloader)
