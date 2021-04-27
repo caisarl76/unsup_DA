@@ -34,7 +34,7 @@ def get_dataset(dataset='office-home', dataset_root='/data', domain='RealWorld',
 
 
 if __name__ == '__main__':
-    for dom in ['real', 'clipart', 'infograph', 'painting', 'quickdraw', 'sketch']
+    # for dom in ['real', 'clipart', 'infograph', 'painting', 'quickdraw', 'sketch']
     train_dataset, val_dataset = get_dataset(dataset='domainnet', dataset_root='/data/jihun',
                                              domain='clipart', ssl=True)
     train_dataloader = data.DataLoader(train_dataset, batch_size=40, shuffle=True,
