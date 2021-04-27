@@ -84,6 +84,7 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
     best_total_val_accuracies = []
 
     for i in range(iter):
+        print(i)
         try:
             _, (x_s, y_s) = train_dataloader_iters.__next__()
         except StopIteration:
