@@ -62,11 +62,10 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
                                alpha=10, beta=0.75, double_bias_lr=True,
                                base_weight_factor=0.1)
 
-    if(args.lr_scheduler):
-        if(args.lr_scheduler == 'Step'):
+    if (args.lr_scheduler):
+        if (args.lr_scheduler == 'Step'):
+            optimizer = optim.Adam(params, lr=args.learning_rate, betas=(0.9, 0.999))
             lr_scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)
-
-
 
     writer = SummaryWriter(log_dir=join(save_dir, 'logs'))
     domain_num = domain_dict[domain]
@@ -89,7 +88,6 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
             _, (x_s, y_s) = train_dataloader_iters.__next__()
 
         optimizer.zero_grad()
-
 
         x_s, y_s = x_s.cuda(args.gpu), y_s.cuda(args.gpu)
         domain_idx = torch.ones(x_s.shape[0], dtype=torch.long).cuda(args.gpu)
