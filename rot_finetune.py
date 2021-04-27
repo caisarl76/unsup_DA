@@ -42,6 +42,8 @@ def parse_args(args=None, namespace=None):
     parser.add_argument("--gpu", type=int, default=0, help="choose gpu device.")
 
     parser.add_argument('--learning-rate', '-lr', dest='learning_rate', help='learning_rate', default=1e-3, type=float)
+    parser.add_argument('--lr-scheduler', '-lrsche', dest='lr_scheduler',
+                        help='learning_rate scheduler [Lambda/Multiplicate/Step/Multistep/Expo', type=float)
     parser.add_argument('--weight-decay', help='weight decay', default=0.0, type=float)
 
     parser.add_argument('--proceed', help='proceed to next stage', default=True, type=bool)
@@ -72,7 +74,6 @@ def main():
     ### 2. train classifier with classification task ###
     pre = torch.load(join(save_dir, 'best_model.ckpt'))
 
-
     model.load_state_dict(pre, strict=False)
 
     del pre
@@ -94,7 +95,6 @@ def main():
         os.makedirs(save_dir, exist_ok=True)
 
     model = normal_train(args, model, train_dataset, val_dataset, args.iters[1], save_dir, args.trg_domain)
-
 
 
 if __name__ == '__main__':
