@@ -18,12 +18,17 @@ from utils.train_utils import LRScheduler, Monitor
 from utils import io_utils, eval_utils
 from collections import OrderedDict
 
-domain_dict = {'RealWorld': 1, 'Clipart': 0}
+# domain_dict = {'RealWorld': 1, 'Clipart': 0}
 root = '/media/hd/jihun/dsbn_result/'
 
+data_pth_dict = {'office-home': 'OfficeHomeDataset_10072016', 'domainnet': 'domainnet'}
+domain_dict = {'office-home': {'RealWorld': 0, 'Art': 1, 'Clipart': 2, 'Product': 3},
+               'domainnet': {'clipart': 0, 'infograph': 1, 'painting': 2, 'quickdraw': 3, 'real': 4, 'sketch': 5}}
 
 def parse_args(args=None, namespace=None):
     parser = argparse.ArgumentParser()
+    parser.add_argument('--dataset', help='directory where dataset exists',
+                        default='officehome', type=str)
     parser.add_argument('--data-root', help='directory where dataset exists',
                         default='/data/OfficeHomeDataset_10072016', type=str)
     parser.add_argument('--save-root', help='directory to save models', type=str)
@@ -57,6 +62,7 @@ def main():
     args = parse_args()
     torch.cuda.set_device(args.gpu)
     save_root = root
+    data_root = join(args.data_root, data_pth_dict[args.dataset])
     if (args.save_root):
         save_root = args.save_root
 
@@ -67,8 +73,8 @@ def main():
 
     model = get_rot_model(args.model_name, num_domains=4)
 
-    train_dataset = rot_dataset(args.data_root, 1, [args.trg_domain], 'train')
-    val_dataset = rot_dataset(args.data_root, 1, [args.trg_domain], 'val')
+    train_dataset = rot_dataset(data_root, 1, [args.trg_domain], 'train')
+    val_dataset = rot_dataset(data_root, 1, [args.trg_domain], 'val')
     model = normal_train(args, model, train_dataset, val_dataset, args.iters[0], save_dir, args.trg_domain)
 
     ### 2. train classifier with classification task ###
@@ -87,8 +93,8 @@ def main():
     torch.nn.init.xavier_uniform_(model.fc1.weight)
     torch.nn.init.xavier_uniform_(model.fc2.weight)
 
-    train_dataset = OFFICEHOME_multi(args.data_root, 1, [args.trg_domain], split='train')
-    val_dataset = OFFICEHOME_multi(args.data_root, 1, [args.trg_domain], split='val')
+    train_dataset = OFFICEHOME_multi(data_root, 1, [args.trg_domain], split='train')
+    val_dataset = OFFICEHOME_multi(data_root, 1, [args.trg_domain], split='val')
 
     save_dir = join(save_root, args.save_dir, 'stage2')
     if not os.path.isdir(save_dir):
