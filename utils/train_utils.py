@@ -45,7 +45,7 @@ def test(args, model, val_dataset, domain_num):
     return model, val_acc
 
 
-def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain, freeze=False):
+def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain, domain_dict=None, freeze=False):
     train_dataloader = util_data.DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True,
                                             num_workers=args.num_workers, drop_last=True, pin_memory=True)
     train_dataloader_iters = enumerate(train_dataloader)
