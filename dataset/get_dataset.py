@@ -33,11 +33,11 @@ def get_dataset(dataset='office-home', dataset_root='/data', domain='RealWorld',
     return train_dataset, val_dataset
 
 
-if __name__ == '__main__':
-    # for dom in ['real', 'clipart', 'infograph', 'painting', 'quickdraw', 'sketch']
-    train_dataset, val_dataset = get_dataset(dataset='domainnet', dataset_root='/data/jihun',
-                                             domain='clipart', ssl=True)
-    train_dataloader = data.DataLoader(train_dataset, batch_size=40, shuffle=True,
-                                       num_workers=5, drop_last=True, pin_memory=True)
-    train_dataloader_iter = enumerate(train_dataloader)
-    print(len(train_dataset))
+# if __name__ == '__main__':
+#     # for dom in ['real', 'clipart', 'infograph', 'painting', 'quickdraw', 'sketch']
+#     train_dataset, val_dataset = get_dataset(dataset='domainnet', dataset_root='/data/jihun',
+#                                              domain='clipart', ssl=True)
+#     train_dataloader = data.DataLoader(train_dataset, batch_size=40, shuffle=True,
+#                                        num_workers=5, drop_last=True, pin_memory=True)
+#     train_dataloader_iter = enumerate(train_dataloader)
+#     print(len(train_dataset))
