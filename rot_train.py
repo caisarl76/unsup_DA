@@ -26,6 +26,7 @@ data_pth_dict = {'office-home': 'OfficeHomeDataset_10072016', 'domainnet': 'doma
 domain_dict = {'office-home': {'RealWorld': 0, 'Art': 1, 'Clipart': 2, 'Product': 3},
                'domainnet': {'clipart': 0, 'infograph': 1, 'painting': 2, 'quickdraw': 3, 'real': 4, 'sketch': 5}}
 
+
 def parse_args(args=None, namespace=None):
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', help='directory where dataset exists',
@@ -35,9 +36,7 @@ def parse_args(args=None, namespace=None):
     parser.add_argument('--save-root', help='directory to save models', type=str)
     parser.add_argument('--save-dir', help='directory to save models', default='ssl_result/0315_3/', type=str)
 
-    parser.add_argument('--model-path', help='directory to save models',
-                        default='ssl_result/0315_3/stage1/best_model.ckpt',
-                        type=str)
+    parser.add_argument('--model-name', default='resnet50dsbn', type=str)
     parser.add_argument('--domain', help='target training dataset', default='Clipart')
 
     parser.add_argument('--num-workers', help='number of worker to load data', default=5, type=int)
@@ -54,7 +53,6 @@ def parse_args(args=None, namespace=None):
     return args
 
 
-
 def main():
     args = parse_args()
     torch.cuda.set_device(args.gpu)
@@ -67,7 +65,8 @@ def main():
     if not os.path.isdir(save_dir):
         os.makedirs(save_dir, exist_ok=True)
 
-    train_dataset, val_dataset = get_dataset(dataset=args.dataset, dataset_root=args.data_root, domain=args.domain, ssl=True)
+    train_dataset, val_dataset = get_dataset(dataset=args.dataset, dataset_root=args.data_root, domain=args.domain,
+                                             ssl=True)
     model = get_rot_model(args.model_name, num_domains=6)
     model = normal_train(args, model, train_dataset, val_dataset, args.iters[0], save_dir, args.domain)
 
