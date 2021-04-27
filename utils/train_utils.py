@@ -95,12 +95,14 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
         loss = ce_loss(pred, y_s)
         writer.add_scalar("Train Loss", loss, i)
         if not freeze:
+            loss.backward()
+            optimizer.step()
+
             if (args.lr_scheduler):
                 lr_scheduler.step()
             else:
                 lr_scheduler(optimizer, i)
-            loss.backward()
-            optimizer.step()
+
 
         if (i % 500 == 0 and i != 0):
             model, acc = test(args, model, val_dataset, domain_num)
