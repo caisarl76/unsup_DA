@@ -34,7 +34,7 @@ def parse_args(args=None, namespace=None):
                         type=str)
     parser.add_argument('--model-name', help='model name', default='resnet50dsbn')
     parser.add_argument('--src-domain', help='source training dataset', default='RealWorld')
-    parser.add_argument('--trg-domain', help='target training dataset', default='Clipart', nargs='+')
+    parser.add_argument('--trg-domain', help='target training dataset', default='Clipart')
 
     parser.add_argument('--num-workers', help='number of worker to load data', default=5, type=int)
     parser.add_argument('--batch-size', help='batch_size', default=40, type=int)
@@ -65,8 +65,8 @@ def main():
 
     model = get_rot_model(args.model_name, num_domains=4)
 
-    train_dataset = rot_dataset(args.data_root, 1, args.trg_domain, 'train')
-    val_dataset = rot_dataset(args.data_root, 1, args.trg_domain, 'val')
+    train_dataset = rot_dataset(args.data_root, 1, [args.trg_domain], 'train')
+    val_dataset = rot_dataset(args.data_root, 1, [args.trg_domain], 'val')
     model = normal_train(args, model, train_dataset, val_dataset, args.iters[0], save_dir, args.trg_domain)
 
     ### 2. train classifier with classification task ###
