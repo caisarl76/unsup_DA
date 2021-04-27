@@ -62,8 +62,8 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
                                alpha=10, beta=0.75, double_bias_lr=True,
                                base_weight_factor=0.1)
 
-    if(args.lrsche):
-        if(args.lrshce == 'Step'):
+    if(args.lr_scheduler):
+        if(args.lr_scheduler == 'Step'):
             lr_scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)
 
 
