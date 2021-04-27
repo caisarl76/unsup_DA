@@ -40,10 +40,3 @@ if __name__ == '__main__':
                                        num_workers=5, drop_last=True, pin_memory=True)
     train_dataloader_iter = enumerate(train_dataloader)
     print(len(train_dataset))
-    img1 = None
-    img2 = None
-    for j, (x_val, y_val) in train_dataloader_iter:
-
-
-
-        break
