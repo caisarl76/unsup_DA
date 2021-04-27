@@ -68,7 +68,7 @@ def main():
     train_dataset, val_dataset = get_dataset(dataset=args.dataset, dataset_root=args.data_root, domain=args.domain,
                                              ssl=True)
     model = get_rot_model(args.model_name, num_domains=6)
-    model = normal_train(args, model, train_dataset, val_dataset, args.iters[0], save_dir, domain_dict[args.dataset], args.domain)
+    model = normal_train(args, model, train_dataset, val_dataset, args.iters[0], save_dir, args.domain)
 
     ### 2. train classifier with classification task ###
     pre = torch.load(join(save_dir, 'best_model.ckpt'))
@@ -93,7 +93,7 @@ def main():
     if not os.path.isdir(save_dir):
         os.makedirs(save_dir, exist_ok=True)
 
-    model = normal_train(args, model, train_dataset, val_dataset, args.iters[1], save_dir, domain_dict[args.dataset], args.domain)
+    model = normal_train(args, model, train_dataset, val_dataset, args.iters[1], save_dir, args.domain)
 
 
 if __name__ == '__main__':
