@@ -89,10 +89,7 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
             _, (x_s, y_s) = train_dataloader_iters.__next__()
 
         optimizer.zero_grad()
-        if(args.lr_scheduler):
-            lr_scheduler.step()
-        else:
-            lr_scheduler(optimizer, i)
+
 
         x_s, y_s = x_s.cuda(args.gpu), y_s.cuda(args.gpu)
         domain_idx = torch.ones(x_s.shape[0], dtype=torch.long).cuda(args.gpu)
@@ -100,6 +97,10 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
         loss = ce_loss(pred, y_s)
         writer.add_scalar("Train Loss", loss, i)
         if not freeze:
+            if (args.lr_scheduler):
+                lr_scheduler.step()
+            else:
+                lr_scheduler(optimizer, i)
             loss.backward()
             optimizer.step()
 
