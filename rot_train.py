@@ -32,7 +32,7 @@ def parse_args(args=None, namespace=None):
     parser.add_argument('--dataset', help='directory where dataset exists',
                         default='office-home', type=str)
     parser.add_argument('--data-root', help='directory where dataset exists',
-                        default='/data/OfficeHomeDataset_10072016', type=str)
+                        default='/data/', type=str)
     parser.add_argument('--save-root', help='directory to save models', type=str)
     parser.add_argument('--save-dir', help='directory to save models', default='ssl_result/0315_3/', type=str)
 
