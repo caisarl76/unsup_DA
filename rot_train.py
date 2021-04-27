@@ -72,12 +72,11 @@ def main():
 
     ### 2. train classifier with classification task ###
     pre = torch.load(join(save_dir, 'best_model.ckpt'))
-
-    model.load_state_dict(pre, strict=False)
-
     del pre
 
     model = get_model(args.model_name, 65, 65, 6)
+    model.load_state_dict(pre, strict=False)
+
     for name, p in model.named_parameters():
         p.requires_grad = False
 
