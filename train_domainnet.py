@@ -1,22 +1,12 @@
 import argparse
-import torch.nn.functional as F
-import torch.optim as optim
 import os
 from os.path import join as join
 import torch
-from torch.utils import data as util_data
-import torch.nn as nn
-import numpy as np
-from torch.utils.tensorboard import SummaryWriter
-
-from dataset.datasets import OFFICEHOME_multi
-from rot_dataset.rot_dataset import rot_dataset
+from collections import OrderedDict
 from model.rot_resnetdsbn import get_rot_model
 from model.factory import get_model
-from utils.train_utils import get_optimizer_params, normal_train, test
-from utils.train_utils import LRScheduler, Monitor
-from utils import io_utils, eval_utils
-from collections import OrderedDict
+from utils.train_utils import normal_train, test
+
 from dataset.get_dataset import get_dataset
 
 # domain_dict = {'RealWorld': 1, 'Clipart': 0}
@@ -61,22 +51,40 @@ def main():
     if (args.save_root):
         save_root = args.save_root
 
-    ### 1. train encoder with rotation task ###
+    trg_train, trg_val = get_dataset(dataset=args.dataset, dataset_root=args.data_root, domain=args.trg_domain,
+                                     ssl=True)
+    trg_num = domain_dict[args.dataset][args.trg_domain]
+    src_train, src_val = get_dataset(dataset=args.dataset, dataset_root=args.data_root, domain=args.src_domain,
+                                     ssl=False)
+    src_num = domain_dict[args.dataset][args.src_domain]
+
+    #################################### STAGE 1 ####################################
     save_dir = join(save_root, args.save_dir, 'stage1')
     if not os.path.isdir(save_dir):
         os.makedirs(save_dir, exist_ok=True)
-
-    train_dataset, val_dataset = get_dataset(dataset=args.dataset, dataset_root=args.data_root, domain=args.domain,
-                                             ssl=True)
     model = get_rot_model(args.model_name, num_domains=6)
-    model = normal_train(args, model, train_dataset, val_dataset, args.iters[0], save_dir, args.domain)
+    model = normal_train(args, model, trg_train, trg_val, args.iters[0], save_dir, args.trg_domain)
 
-    ### 2. train classifier with classification task ###
+    #################################### STAGE 2 ####################################
     pre = torch.load(join(save_dir, 'best_model.ckpt'))
-    del pre
-
     model = get_model(args.model_name, 65, 65, 6)
     model.load_state_dict(pre, strict=False)
+    del pre
+
+    src_bn = 'bns.' + (str)(src_num)
+    trg_bn = 'bns.' + (str)(trg_num)
+
+    weight_dict = OrderedDict()
+    for name, p in model.named_parameters():
+        if (trg_bn in name):
+            weight_dict[name] = p
+            new_name = name.replace(trg_bn, src_bn)
+            weight_dict[new_name] = p
+        elif (src_bn in name):
+            continue
+        else:
+            weight_dict[name] = p
+    model.load_state_dict(weight_dict, strict=False)
 
     for name, p in model.named_parameters():
         p.requires_grad = False
@@ -86,15 +94,18 @@ def main():
     torch.nn.init.xavier_uniform_(model.fc1.weight)
     torch.nn.init.xavier_uniform_(model.fc2.weight)
 
-    train_dataset, val_dataset = get_dataset(dataset=args.dataset, dataset_root=args.data_root, domain=args.domain,
-                                             ssl=False)
-
     save_dir = join(save_root, args.save_dir, 'stage2')
     if not os.path.isdir(save_dir):
         os.makedirs(save_dir, exist_ok=True)
 
-    model = normal_train(args, model, train_dataset, val_dataset, args.iters[1], save_dir, args.domain)
+    model = normal_train(args, model, src_train, src_val, args.iters[1], save_dir, args.src_domain)
 
+    #################################### STAGE 3 ####################################
+
+    _, stage3_acc = test(args, model, trg_val, domain_dict[args.dataset][args.trg_domain])
+    print('####################################')
+    print('### stage 3 at stage1 iter: best', '||  %0.3f' % (stage3_acc))
+    print('####################################')
 
 if __name__ == '__main__':
     main()
