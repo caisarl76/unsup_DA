@@ -43,7 +43,7 @@ def parse_args(args=None, namespace=None):
 
     parser.add_argument('--learning-rate', '-lr', dest='learning_rate', help='learning_rate', default=1e-3, type=float)
     parser.add_argument('--lr-scheduler', '-lrsche', dest='lr_scheduler',
-                        help='learning_rate scheduler [Lambda/Multiplicate/Step/Multistep/Expo', type=float)
+                        help='learning_rate scheduler [Lambda/Multiplicate/Step/Multistep/Expo', type=str)
     parser.add_argument('--weight-decay', help='weight decay', default=0.0, type=float)
 
     parser.add_argument('--proceed', help='proceed to next stage', default=True, type=bool)
