@@ -30,18 +30,18 @@ domain_dict = {'office-home': {'RealWorld': 0, 'Art': 1, 'Clipart': 2, 'Product'
 def parse_args(args=None, namespace=None):
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', help='directory where dataset exists',
-                        default='office-home', type=str)
+                        default='domainnet', type=str)
     parser.add_argument('--data-root', help='directory where dataset exists',
                         default='/data/', type=str)
     parser.add_argument('--save-root', help='directory to save models', type=str)
     parser.add_argument('--save-dir', help='directory to save models', default='ssl_result/0315_3/', type=str)
 
     parser.add_argument('--model-name', default='resnet50dsbn', type=str)
-    parser.add_argument('--domain', help='target training dataset', default='Clipart')
+    parser.add_argument('--domain', help='target training dataset', default='clipart')
 
     parser.add_argument('--num-workers', help='number of worker to load data', default=5, type=int)
-    parser.add_argument('--batch-size', help='batch_size', default=40, type=int)
-    parser.add_argument("--iters", type=int, default=[20000, 20000], help="choose gpu device.", nargs='+')
+    parser.add_argument('--batch-size', help='batch_size', default=100, type=int)
+    parser.add_argument("--iters", type=int, default=[100000, 50000], help="choose gpu device.", nargs='+')
     parser.add_argument("--gpu", type=int, default=0, help="choose gpu device.")
 
     parser.add_argument('--learning-rate', '-lr', dest='learning_rate', help='learning_rate', default=1e-3, type=float)
