@@ -65,8 +65,8 @@ def main():
 
     model = get_rot_model(args.model_name, num_domains=4)
 
-    train_dataset = rot_dataset(args.data_root, 1, [args.trg_domain], 'train')
-    val_dataset = rot_dataset(args.data_root, 1, [args.trg_domain], 'val')
+    train_dataset = rot_dataset(args.data_root, 1, args.trg_domain, 'train')
+    val_dataset = rot_dataset(args.data_root, 1, args.trg_domain, 'val')
     model = normal_train(args, model, train_dataset, val_dataset, args.iters[0], save_dir, args.trg_domain)
 
     ### 2. train classifier with classification task ###
