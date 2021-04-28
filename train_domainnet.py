@@ -75,7 +75,6 @@ def main():
         pre = torch.load(join(save_dir, 'best_model.ckpt'))
         model = get_model(args.model_name, 344, 344, 6)
         model.load_state_dict(pre, strict=False)
-        del pre
 
         src_bn = 'bns.' + (str)(src_num)
         trg_bn = 'bns.' + (str)(trg_num)
