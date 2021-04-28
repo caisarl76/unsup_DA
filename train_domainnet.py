@@ -22,7 +22,7 @@ def parse_args(args=None, namespace=None):
     parser.add_argument('--dataset', help='directory where dataset exists',
                         default='domainnet', type=str)
     parser.add_argument('--data-root', help='directory where dataset exists',
-                        default='/data/jihun', type=str)
+                        default='/data/', type=str)
     parser.add_argument('--save-root', help='directory to save models', default='/results/result/rot_ssl/', type=str)
     # parser.add_argument('--save-root', help='directory to save models', default='/media/hd/jihun/dsbn_result/', type=str)
 
