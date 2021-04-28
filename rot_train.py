@@ -59,40 +59,46 @@ def main():
     save_root = root
     if (args.save_root):
         save_root = args.save_root
+    stage = args.stage
 
     ### 1. train encoder with rotation task ###
     save_dir = join(save_root, args.save_dir, 'stage1')
     if not os.path.isdir(save_dir):
         os.makedirs(save_dir, exist_ok=True)
 
-    train_dataset, val_dataset = get_dataset(dataset=args.dataset, dataset_root=args.data_root, domain=args.domain,
-                                             ssl=True)
-    model = get_rot_model(args.model_name, num_domains=6)
-    model = normal_train(args, model, train_dataset, val_dataset, args.iters[0], save_dir, args.domain)
+    if (stage == 1):
+        train_dataset, val_dataset = get_dataset(dataset=args.dataset, dataset_root=args.data_root, domain=args.domain,
+                                                 ssl=True)
+
+        model = get_rot_model(args.model_name, num_domains=6)
+        model = normal_train(args, model, train_dataset, val_dataset, args.iters[0], save_dir, args.domain)
+
+        stage += 1
+
 
     ### 2. train classifier with classification task ###
-    pre = torch.load(join(save_dir, 'best_model.ckpt'))
-    del pre
+    if(stage==2):
+        pre = torch.load(join(save_dir, 'best_model.ckpt'))
 
-    model = get_model(args.model_name, 344, 344, 6)
-    model.load_state_dict(pre, strict=False)
+        model = get_model(args.model_name, 344, 344, 6)
+        model.load_state_dict(pre, strict=False)
 
-    for name, p in model.named_parameters():
-        p.requires_grad = False
+        for name, p in model.named_parameters():
+            p.requires_grad = False
 
-    model.fc1.weight.requires_grad = True
-    model.fc2.weight.requires_grad = True
-    torch.nn.init.xavier_uniform_(model.fc1.weight)
-    torch.nn.init.xavier_uniform_(model.fc2.weight)
+        model.fc1.weight.requires_grad = True
+        model.fc2.weight.requires_grad = True
+        torch.nn.init.xavier_uniform_(model.fc1.weight)
+        torch.nn.init.xavier_uniform_(model.fc2.weight)
 
-    train_dataset, val_dataset = get_dataset(dataset=args.dataset, dataset_root=args.data_root, domain=args.domain,
-                                             ssl=False)
+        train_dataset, val_dataset = get_dataset(dataset=args.dataset, dataset_root=args.data_root, domain=args.domain,
+                                                 ssl=False)
 
-    save_dir = join(save_root, args.save_dir, 'stage2')
-    if not os.path.isdir(save_dir):
-        os.makedirs(save_dir, exist_ok=True)
+        save_dir = join(save_root, args.save_dir, 'stage2')
+        if not os.path.isdir(save_dir):
+            os.makedirs(save_dir, exist_ok=True)
 
-    model = normal_train(args, model, train_dataset, val_dataset, args.iters[1], save_dir, args.domain)
+        model = normal_train(args, model, train_dataset, val_dataset, args.iters[1], save_dir, args.domain)
 
 
 if __name__ == '__main__':
