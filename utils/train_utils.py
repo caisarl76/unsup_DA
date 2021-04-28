@@ -107,7 +107,7 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
                 lr_scheduler.step()
             else:
                 lr_scheduler(optimizer, i)
-        if (i % 100 == 0 and i != 0):
+        if (i % 1 == 0 and i != 0):
         # if (i % 500 == 0 and i != 0):
             model, acc = test(args, model, val_dataset, domain_num)
             # print('%d iter || val acc: %0.3f' % (i, acc))
@@ -120,7 +120,7 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
                 # save best checkpoint
                 io_utils.save_check(save_dir, i, model_dict, optimizer_dict, best=True)
             # if (i % 20000 == 10000 and i != 0):
-            if (i % 200 == 100 and i != 0):
+            if (i % 2 == 1 and i != 0):
                 print('%d iter accuracy: %0.3f' % (i, acc))
                 if save_model:
                     model_dict = {'model': model.cpu().state_dict()}

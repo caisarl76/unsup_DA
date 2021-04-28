@@ -40,7 +40,7 @@ def parse_args(args=None, namespace=None):
 
     parser.add_argument('--num-workers', help='number of worker to load data', default=5, type=int)
     parser.add_argument('--batch-size', help='batch_size', default=100, type=int)
-    parser.add_argument("--iters", type=int, default=[550, 550], help="choose gpu device.", nargs='+')
+    parser.add_argument("--iters", type=int, default=[6, 6], help="choose gpu device.", nargs='+')
     parser.add_argument("--gpu", type=int, default=0, help="choose gpu device.")
 
     parser.add_argument('--learning-rate', '-lr', dest='learning_rate', help='learning_rate', default=1e-3, type=float)
@@ -85,7 +85,7 @@ def main():
 
         for i in range(5):
             # iter = i * 20000 + 10000
-            iter = i * 200 + 100
+            iter = i * 2 + 1
             pre = torch.load(join(save_dir, '%d_model.ckpt'%(iter)))
             model = load_model(args.model_name, in_features=class_dict[args.dataset],
                                num_classes=class_dict[args.dataset],
