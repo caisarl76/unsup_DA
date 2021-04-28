@@ -58,7 +58,7 @@ def main():
         save_root = args.save_root
 
     trg_ssl_train, trg_ssl_val = get_dataset(dataset=args.dataset, dataset_root=args.data_root, domain=args.trg_domain,
-                                     ssl=True)
+                                             ssl=True)
     trg_sup_train, trg_sup_val = get_dataset(dataset=args.dataset, dataset_root=args.data_root, domain=args.trg_domain,
                                              ssl=False)
     trg_num = domain_dict[args.dataset][args.trg_domain]
@@ -71,23 +71,27 @@ def main():
     #################################### STAGE 1 ####################################
     if stage == 1:
 
-        if(args.ssl):
+        if args.ssl:
             model = get_rot_model(args.model_name, num_domains=6)
             model = normal_train(args, model, trg_ssl_train, trg_ssl_val, args.iters[0], save_dir, args.trg_domain)
-
+        else:
+            model = get_model(args.model_name, in_features=345, num_classes=345, num_domains=6)
+            model = normal_train(args, model, trg_sup_train, trg_sup_val, args.iters[0], save_dir, args.trg_domain)
         stage += 1
 
     #################################### STAGE 2 ####################################
     if stage == 2:
-        pre = torch.load(join(save_dir, 'best_model.ckpt'))
-        model = get_model(args.model_name, in_features=345, num_classes=345, num_domains=6)
-        model.load_state_dict(pre, strict=False)
+        if args.ssl:
+            pre = torch.load(join(save_dir, 'best_model.ckpt'))
+            model = get_model(args.model_name, in_features=345, num_classes=345, num_domains=6)
+            model.load_state_dict(pre, strict=False)
 
         src_bn = 'bns.' + (str)(src_num)
         trg_bn = 'bns.' + (str)(trg_num)
 
         weight_dict = OrderedDict()
         for name, p in model.named_parameters():
+            p.requires_grad = False
             if (trg_bn in name):
                 weight_dict[name] = p
                 new_name = name.replace(trg_bn, src_bn)
@@ -97,9 +101,6 @@ def main():
             else:
                 weight_dict[name] = p
         model.load_state_dict(weight_dict, strict=False)
-
-        for name, p in model.named_parameters():
-            p.requires_grad = False
 
         model.fc1.weight.requires_grad = True
         model.fc2.weight.requires_grad = True
@@ -114,7 +115,7 @@ def main():
 
         #################################### STAGE 3 ####################################
 
-        _, stage3_acc = test(args, model, trg_val, domain_dict[args.dataset][args.trg_domain])
+        _, stage3_acc = test(args, model, trg_sup_val, domain_dict[args.dataset][args.trg_domain])
         print('####################################')
         print('### stage 3 at stage1 iter: best', '||  %0.3f' % (stage3_acc))
         print('####################################')
