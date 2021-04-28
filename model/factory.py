@@ -3,10 +3,12 @@ Factory method for easily getting model by name.
 written by wgchang
 """
 from model import lenet, alexnet, resnet, resnetdsbn
+
 __sets = {}
 
-for model_name in ['lenet', 'lenetdsbn', 'alexnet','resnet18dsbn' , 'resnet50', 'resnet101', 'resnet152', 'resnet50dsbn',
-                   'resnet101dsbn',  'resnet152dsbn']:
+for model_name in ['lenet', 'lenetdsbn', 'alexnet', 'resnet18dsbn', 'resnet50', 'resnet101', 'resnet152',
+                   'resnet50dsbn',
+                   'resnet101dsbn', 'resnet152dsbn']:
 
     if model_name == 'lenet':
         __sets[model_name] = (lambda num_classes, in_features, pretrained, num_domains:
@@ -59,7 +61,6 @@ for model_name in ['lenet', 'lenetdsbn', 'alexnet','resnet18dsbn' , 'resnet50', 
                                                                 in_features=in_features, num_domains=num_domains))
 
 
-
 def get_model(model_name, num_classes, in_features=0, num_domains=2, pretrained=False):
     model_key = model_name
     if model_key not in __sets:
@@ -67,3 +68,13 @@ def get_model(model_name, num_classes, in_features=0, num_domains=2, pretrained=
             'Unknown Model: {}, num_classes: {}, in_features: {}'.format(model_key, num_classes, in_features))
     return __sets[model_key](num_classes=num_classes, in_features=in_features,
                              pretrained=pretrained, num_domains=num_domains)
+
+
+def load_model(model_name, num_classes, in_features, num_domains, pretrained=False, cut_conv=4):
+    if model_name == 'resnet18dsbn':
+        model = resnetdsbn.resnet18dsbn(pretrained=pretrained, num_classes=num_classes, in_features=in_features,
+                                        num_domains=num_domains, cut_conv=cut_conv)
+    elif model_name == 'resnet50dsbn':
+        model = resnetdsbn.resnet50dsbn(pretrained=pretrained, num_classes=num_classes, in_features=in_features,
+                                        num_domains=num_domains, cut_conv=cut_conv)
+    return model

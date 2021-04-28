@@ -48,7 +48,7 @@ def test(args, model, val_dataset, domain_num):
 
 
 def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain, freeze=False):
-    print(freeze)
+    # print(freeze)
     domain_dict = domain_lib[args.dataset]
     train_dataloader = util_data.DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True,
                                             num_workers=args.num_workers, drop_last=True, pin_memory=True)

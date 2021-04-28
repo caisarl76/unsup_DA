@@ -1,4 +1,5 @@
 import argparse
+from collections import OrderedDict
 import torch.nn.functional as F
 import torch.optim as optim
 import os
@@ -9,14 +10,11 @@ import torch.nn as nn
 import numpy as np
 from torch.utils.tensorboard import SummaryWriter
 
-from dataset.datasets import OFFICEHOME_multi
-from rot_dataset.rot_dataset import rot_dataset
+from model.factory import load_model
 from model.rot_resnetdsbn import get_rot_model
 from model.factory import get_model
 from utils.train_utils import get_optimizer_params, normal_train, test
-from utils.train_utils import LRScheduler, Monitor
-from utils import io_utils, eval_utils
-from collections import OrderedDict
+
 from dataset.get_dataset import get_dataset
 
 # domain_dict = {'RealWorld': 1, 'Clipart': 0}
@@ -25,6 +23,7 @@ root = '/media/hd/jihun/dsbn_result/'
 data_pth_dict = {'office-home': 'OfficeHomeDataset_10072016', 'domainnet': 'domainnet'}
 domain_dict = {'office-home': {'RealWorld': 0, 'Art': 1, 'Clipart': 2, 'Product': 3},
                'domainnet': {'clipart': 0, 'infograph': 1, 'painting': 2, 'quickdraw': 3, 'real': 4, 'sketch': 5}}
+class_dict = {'office-home': 65, 'domainnet': 345}
 
 
 def parse_args(args=None, namespace=None):
@@ -72,25 +71,35 @@ def main():
         train_dataset, val_dataset = get_dataset(dataset=args.dataset, dataset_root=args.data_root, domain=args.domain,
                                                  ssl=True)
 
-        model = get_rot_model(args.model_name, num_domains=6)
+        model = load_model(args.model_name, num_classes=4, num_domains=6, pretrained=True)
+        # model = get_rot_model(args.model_name, num_domains=6)
         model = normal_train(args, model, train_dataset, val_dataset, args.iters[0], save_dir, args.domain)
 
         stage += 1
 
     ### 2. train classifier with classification task ###
-    if(stage==2):
+    if (stage == 2):
         pre = torch.load(join(save_dir, 'best_model.ckpt'))
 
-        model = get_model(args.model_name, in_features=345, num_classes=345, num_domains=6)
-        model.load_state_dict(pre, strict=False)
+        model = load_model(args.model_name, in_features=class_dict[args.dataset], num_classes=class_dict[args.dataset],
+                           num_domains=6, pretrained=True, cut_conv=2)
+
+        new_pre = OrderedDict()
+        for key in pre.keys():
+            if 'fc' in key:
+                print(key)
+            else:
+                new_pre[key] = pre[key]
+
+        model.load_state_dict(new_pre, strict=False)
 
         for name, p in model.named_parameters():
             p.requires_grad = False
 
-        model.fc1.weight.requires_grad = True
-        model.fc2.weight.requires_grad = True
         torch.nn.init.xavier_uniform_(model.fc1.weight)
         torch.nn.init.xavier_uniform_(model.fc2.weight)
+        model.fc1.weight.requires_grad = True
+        model.fc2.weight.requires_grad = True
 
         train_dataset, val_dataset = get_dataset(dataset=args.dataset, dataset_root=args.data_root, domain=args.domain,
                                                  ssl=False)
