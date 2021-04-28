@@ -61,8 +61,8 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
                                   double_bias_lr=True, base_weight_factor=0.1)
     optimizer = optim.Adam(params, betas=(0.9, 0.999))
     ce_loss = nn.CrossEntropyLoss()
-    lr_scheduler = LRScheduler(args.learning_rate, 5e-6, 0,
-    # lr_scheduler=LRScheduler(args.learning_rate, 5e-6, 5000,
+    # lr_scheduler = LRScheduler(args.learning_rate, 5e-6, 0,
+    lr_scheduler=LRScheduler(args.learning_rate, 5e-6, 5000,
                                num_steps=iter,
                                alpha=10, beta=0.75, double_bias_lr=True,
                                base_weight_factor=0.1)
@@ -108,8 +108,8 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
                 lr_scheduler.step()
             else:
                 lr_scheduler(optimizer, i)
-        if (i % 1 == 0 and i != 0):
-        # if (i % 500 == 0 and i != 0):
+        # if (i % 1 == 0 and i != 0):
+        if (i % 500 == 0 and i != 0):
             model, acc = test(args, model, val_dataset, domain_num)
             # print('%d iter || val acc: %0.3f' % (i, acc))
             writer.add_scalar("Val Accuracy", acc, i)
@@ -120,8 +120,8 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
 
                 # save best checkpoint
                 io_utils.save_check(save_dir, i, model_dict, optimizer_dict, best=True)
-            # if (i % 20000 == 10000 and i != 0):
-            if (i % 2 == 1 and i != 0):
+            if (i % 20000 == 10000 and i != 0):
+            # if (i % 2 == 1 and i != 0):
                 print('%d iter accuracy: %0.3f' % (i, acc))
                 if save_model:
                     model_dict = {'model': model.cpu().state_dict()}
