@@ -62,6 +62,13 @@ def main():
         save_root = args.save_root
     stage = args.stage
 
+    if (args.dataset == 'domainnet'):
+        num_domain = 6
+        num_classes = 345
+    elif (args.dataset == 'office-home'):
+        num_domain = 4
+        num_classes = 65
+
     ### 1. train encoder with rotation task ###
     save_dir = join(save_root, args.save_dir, 'stage1')
     if not os.path.isdir(save_dir):
@@ -71,7 +78,7 @@ def main():
         train_dataset, val_dataset = get_dataset(dataset=args.dataset, dataset_root=args.data_root, domain=args.domain,
                                                  ssl=True)
 
-        model = load_model(args.model_name, in_features=256, num_classes=4, num_domains=6, pretrained=True)
+        model = load_model(args.model_name, in_features=256, num_classes=4, num_domains=num_domain, pretrained=True)
         # model = get_rot_model(args.model_name, num_domains=6)
         model = normal_train(args, model, train_dataset, val_dataset, args.iters[0], save_dir, args.domain,
                              save_model=True)
@@ -86,7 +93,7 @@ def main():
         for i in range(5):
             # iter = i * 20000 + 10000
             iter = i * 2 + 1
-            pre = torch.load(join(save_dir, '%d_model.ckpt'%(iter)))
+            pre = torch.load(join(save_dir, '%d_model.ckpt' % (iter)))
             model = load_model(args.model_name, in_features=class_dict[args.dataset],
                                num_classes=class_dict[args.dataset],
                                num_domains=6, pretrained=True)
@@ -105,7 +112,7 @@ def main():
             model.fc1.weight.requires_grad = True
             model.fc2.weight.requires_grad = True
 
-            save_dir = join(save_root, args.save_dir, 'stage2_%d'%(iter))
+            save_dir = join(save_root, args.save_dir, 'stage2_%d' % (iter))
             if not os.path.isdir(save_dir):
                 os.makedirs(save_dir, exist_ok=True)
 
@@ -113,8 +120,8 @@ def main():
 
         pre = torch.load(join(save_dir, 'best_model.ckpt'))
 
-        model = load_model(args.model_name, in_features=class_dict[args.dataset], num_classes=class_dict[args.dataset],
-                           num_domains=6, pretrained=True)
+        model = load_model(args.model_name, in_features=num_classes, num_classes=num_classes, num_domains=num_domain,
+                           pretrained=True)
 
         new_pre = OrderedDict()
         for key in pre.keys():
@@ -132,7 +139,6 @@ def main():
         torch.nn.init.xavier_uniform_(model.fc2.weight)
         model.fc1.weight.requires_grad = True
         model.fc2.weight.requires_grad = True
-
 
         save_dir = join(save_root, args.save_dir, 'stage2')
         if not os.path.isdir(save_dir):

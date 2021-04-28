@@ -62,6 +62,7 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
     optimizer = optim.Adam(params, betas=(0.9, 0.999))
     ce_loss = nn.CrossEntropyLoss()
     lr_scheduler = LRScheduler(args.learning_rate, 5e-6, 0,
+    # lr_scheduler=LRScheduler(args.learning_rate, 5e-6, 5000,
                                num_steps=iter,
                                alpha=10, beta=0.75, double_bias_lr=True,
                                base_weight_factor=0.1)
