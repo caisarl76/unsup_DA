@@ -40,6 +40,8 @@ def parse_args(args=None, namespace=None):
                         help='learning_rate scheduler [Lambda/Multiplicate/Step/Multistep/Expo', type=str)
     parser.add_argument('--weight-decay', help='weight decay', default=0.0, type=float)
 
+    parser.add_argument("--stage", type=int, default=1)
+
     args = parser.parse_args(args=args, namespace=namespace)
     return args
 
@@ -48,6 +50,7 @@ def main():
     args = parse_args()
     torch.cuda.set_device(args.gpu)
     save_root = root
+    stage = args.stage
     if (args.save_root):
         save_root = args.save_root
 
@@ -57,55 +60,59 @@ def main():
     src_train, src_val = get_dataset(dataset=args.dataset, dataset_root=args.data_root, domain=args.src_domain,
                                      ssl=False)
     src_num = domain_dict[args.dataset][args.src_domain]
-
-    #################################### STAGE 1 ####################################
     save_dir = join(save_root, args.save_dir, 'stage1')
     if not os.path.isdir(save_dir):
         os.makedirs(save_dir, exist_ok=True)
-    model = get_rot_model(args.model_name, num_domains=6)
-    model = normal_train(args, model, trg_train, trg_val, args.iters[0], save_dir, args.trg_domain)
+    #################################### STAGE 1 ####################################
+    if stage == 1:
+        model = get_rot_model(args.model_name, num_domains=6)
+        model = normal_train(args, model, trg_train, trg_val, args.iters[0], save_dir, args.trg_domain)
+
+        stage += 1
 
     #################################### STAGE 2 ####################################
-    pre = torch.load(join(save_dir, 'best_model.ckpt'))
-    model = get_model(args.model_name, 65, 65, 6)
-    model.load_state_dict(pre, strict=False)
-    del pre
+    if stage == 2:
+        pre = torch.load(join(save_dir, 'best_model.ckpt'))
+        model = get_model(args.model_name, 344, 344, 6)
+        model.load_state_dict(pre, strict=False)
+        del pre
 
-    src_bn = 'bns.' + (str)(src_num)
-    trg_bn = 'bns.' + (str)(trg_num)
+        src_bn = 'bns.' + (str)(src_num)
+        trg_bn = 'bns.' + (str)(trg_num)
 
-    weight_dict = OrderedDict()
-    for name, p in model.named_parameters():
-        if (trg_bn in name):
-            weight_dict[name] = p
-            new_name = name.replace(trg_bn, src_bn)
-            weight_dict[new_name] = p
-        elif (src_bn in name):
-            continue
-        else:
-            weight_dict[name] = p
-    model.load_state_dict(weight_dict, strict=False)
+        weight_dict = OrderedDict()
+        for name, p in model.named_parameters():
+            if (trg_bn in name):
+                weight_dict[name] = p
+                new_name = name.replace(trg_bn, src_bn)
+                weight_dict[new_name] = p
+            elif (src_bn in name):
+                continue
+            else:
+                weight_dict[name] = p
+        model.load_state_dict(weight_dict, strict=False)
 
-    for name, p in model.named_parameters():
-        p.requires_grad = False
+        for name, p in model.named_parameters():
+            p.requires_grad = False
 
-    model.fc1.weight.requires_grad = True
-    model.fc2.weight.requires_grad = True
-    torch.nn.init.xavier_uniform_(model.fc1.weight)
-    torch.nn.init.xavier_uniform_(model.fc2.weight)
+        model.fc1.weight.requires_grad = True
+        model.fc2.weight.requires_grad = True
+        torch.nn.init.xavier_uniform_(model.fc1.weight)
+        torch.nn.init.xavier_uniform_(model.fc2.weight)
 
-    save_dir = join(save_root, args.save_dir, 'stage2')
-    if not os.path.isdir(save_dir):
-        os.makedirs(save_dir, exist_ok=True)
+        save_dir = join(save_root, args.save_dir, 'stage2')
+        if not os.path.isdir(save_dir):
+            os.makedirs(save_dir, exist_ok=True)
 
-    model = normal_train(args, model, src_train, src_val, args.iters[1], save_dir, args.src_domain)
+        model = normal_train(args, model, src_train, src_val, args.iters[1], save_dir, args.src_domain)
 
-    #################################### STAGE 3 ####################################
+        #################################### STAGE 3 ####################################
 
-    _, stage3_acc = test(args, model, trg_val, domain_dict[args.dataset][args.trg_domain])
-    print('####################################')
-    print('### stage 3 at stage1 iter: best', '||  %0.3f' % (stage3_acc))
-    print('####################################')
+        _, stage3_acc = test(args, model, trg_val, domain_dict[args.dataset][args.trg_domain])
+        print('####################################')
+        print('### stage 3 at stage1 iter: best', '||  %0.3f' % (stage3_acc))
+        print('####################################')
+
 
 if __name__ == '__main__':
     main()

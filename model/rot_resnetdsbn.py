@@ -354,5 +354,5 @@ def get_rot_model(model_name, num_domains=2):
 
 
 if __name__ == '__main__':
-    model = get_rot_model('resnet18dsbn')
+    model = get_rot_model('resnet50dsbn')
     print(model)

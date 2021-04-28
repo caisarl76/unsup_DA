@@ -74,7 +74,7 @@ def main():
     pre = torch.load(join(save_dir, 'best_model.ckpt'))
     del pre
 
-    model = get_model(args.model_name, 65, 65, 6)
+    model = get_model(args.model_name, 344, 344, 6)
     model.load_state_dict(pre, strict=False)
 
     for name, p in model.named_parameters():
@@ -97,3 +97,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+    # model = get_model('resnet50dsbn', 344, 344, 6)
+    # print(model)
