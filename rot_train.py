@@ -49,6 +49,8 @@ def parse_args(args=None, namespace=None):
                         help='learning_rate scheduler [Lambda/Multiplicate/Step/Multistep/Expo', type=str)
     parser.add_argument('--weight-decay', help='weight decay', default=0.0, type=float)
 
+    parser.add_argument("--stage", type=int, default=1)
+
     args = parser.parse_args(args=args, namespace=namespace)
     return args
 
@@ -74,7 +76,6 @@ def main():
         model = normal_train(args, model, train_dataset, val_dataset, args.iters[0], save_dir, args.domain)
 
         stage += 1
-
 
     ### 2. train classifier with classification task ###
     if(stage==2):
