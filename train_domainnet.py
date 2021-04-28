@@ -75,7 +75,7 @@ def main():
     #################################### STAGE 2 ####################################
     if stage == 2:
         pre = torch.load(join(save_dir, 'best_model.ckpt'))
-        model = get_model(args.model_name, in_features=344, num_classes=344, num_domains=6)
+        model = get_model(args.model_name, in_features=345, num_classes=345, num_domains=6)
         print(model)
         model.load_state_dict(pre, strict=False)
 
