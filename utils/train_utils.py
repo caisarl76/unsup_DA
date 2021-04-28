@@ -96,7 +96,7 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
         domain_idx = torch.ones(x_s.shape[0], dtype=torch.long).cuda(args.gpu)
         pred, f = model(x_s, domain_num * domain_idx, with_ft=True)
         loss = ce_loss(pred, y_s)
-        print(pred.shape, y_s.shape)
+        # print(pred.shape, y_s.shape)
         writer.add_scalar("Train Loss", loss, i)
         if not freeze:
             loss.backward()

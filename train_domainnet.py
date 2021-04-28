@@ -22,17 +22,19 @@ def parse_args(args=None, namespace=None):
     parser.add_argument('--dataset', help='directory where dataset exists',
                         default='domainnet', type=str)
     parser.add_argument('--data-root', help='directory where dataset exists',
-                        default='/data/', type=str)
+                        default='/data/jihun', type=str)
     parser.add_argument('--save-root', help='directory to save models', default='/results/result/rot_ssl/', type=str)
-    parser.add_argument('--save-dir', help='directory to save models', default='domainnet/clipart_real', type=str)
+    # parser.add_argument('--save-root', help='directory to save models', default='/media/hd/jihun/dsbn_result/', type=str)
+
+    parser.add_argument('--save-dir', help='directory to save models', default='domainnet/clipart_sketch', type=str)
 
     parser.add_argument('--model-name', default='resnet50dsbn', type=str)
     parser.add_argument('--trg-domain', help='target training dataset', default='clipart')
-    parser.add_argument('--src-domain', help='target training dataset', default='real')
+    parser.add_argument('--src-domain', help='target training dataset', default='sketch')
 
     parser.add_argument('--num-workers', help='number of worker to load data', default=5, type=int)
-    parser.add_argument('--batch-size', help='batch_size', default=100, type=int)
-    parser.add_argument("--iters", type=int, default=[100000, 50000], help="choose gpu device.", nargs='+')
+    parser.add_argument('--batch-size', help='batch_size', default=2, type=int)
+    parser.add_argument("--iters", type=int, default=[550, 550], help="choose gpu device.", nargs='+')
     parser.add_argument("--gpu", type=int, default=0, help="choose gpu device.")
 
     parser.add_argument('--learning-rate', '-lr', dest='learning_rate', help='learning_rate', default=1e-3, type=float)
@@ -40,7 +42,7 @@ def parse_args(args=None, namespace=None):
                         help='learning_rate scheduler [Lambda/Multiplicate/Step/Multistep/Expo', type=str)
     parser.add_argument('--weight-decay', help='weight decay', default=0.0, type=float)
 
-    parser.add_argument("--stage", type=int, default=1)
+    parser.add_argument("--stage", type=int, default=2)
 
     args = parser.parse_args(args=args, namespace=namespace)
     return args
