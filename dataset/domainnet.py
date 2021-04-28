@@ -3,6 +3,7 @@ import os
 import numpy as np
 
 from PIL import Image
+from torch.utils import data
 import torchvision.transforms as transforms
 import torchvision.transforms.functional as TF
 from torch.utils.data import DataLoader, Dataset
@@ -92,3 +93,16 @@ def get_domainnet_dloader(dataset_path, domain_name, ssl=False):
     # test_dloader = DataLoader(test_dataset, batch_size=batch_size, num_workers=num_workers, pin_memory=True,
     #                           shuffle=True)
     # return train_dloader, test_dloader
+
+
+if __name__ == '__main__':
+    train, val = get_domainnet_dloader('/data/jihun/domainnet', 'clipart', ssl=False)
+    dataloader = data.DataLoader(train, batch_size=10, num_workers=2, shuffle=True)
+    iters = enumerate(dataloader)
+    for i in range(10):
+        try:
+            _, (x_s, y_s) = iters.__next__()
+        except StopIteration:
+            iters = enumerate(dataloader)
+            _, (x_s, y_s) = iters.__next__()
+        print(y_s)
