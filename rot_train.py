@@ -62,6 +62,9 @@ def main():
         save_root = args.save_root
     stage = args.stage
 
+    num_domain = 4
+    num_classes = 65
+
     if (args.dataset == 'domainnet'):
         num_domain = 6
         num_classes = 345
