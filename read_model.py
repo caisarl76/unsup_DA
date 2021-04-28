@@ -27,9 +27,7 @@ def main():
             weight_dict[new_name] = p
 
     model.load_state_dict(weight_dict, strict=False)
-    # for name, p in model.named_parameters():
-    #     if name == 'layer4.0.bn1.bns.1.weight':
-    #         print(p)
+
 
 
 if __name__ == '__main__':
