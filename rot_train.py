@@ -94,8 +94,8 @@ def main():
                                                  ssl=False)
 
         for i in range(4):
-            # iter = i * 20000 + 10000
-            iter = i * 2 + 1
+            iter = i * 20000 + 10000
+            # iter = i * 2 + 1
             pre = torch.load(join(save_dir, '%d_weight.ckpt' % (iter)))
             model = load_model(args.model_name, in_features=class_dict[args.dataset],
                                num_classes=class_dict[args.dataset],
