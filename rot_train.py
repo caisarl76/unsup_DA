@@ -71,7 +71,7 @@ def main():
         train_dataset, val_dataset = get_dataset(dataset=args.dataset, dataset_root=args.data_root, domain=args.domain,
                                                  ssl=True)
 
-        model = load_model(args.model_name, num_classes=4, num_domains=6, pretrained=True)
+        model = load_model(args.model_name, in_features=256, num_classes=4, num_domains=6, pretrained=True)
         # model = get_rot_model(args.model_name, num_domains=6)
         model = normal_train(args, model, train_dataset, val_dataset, args.iters[0], save_dir, args.domain,
                              save_model=True)
