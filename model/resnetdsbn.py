@@ -224,9 +224,7 @@ def _update_initial_weights_dsbn(state_dict, num_classes=1000, num_domains=2, ds
 
 
 class DSBNResNet(nn.Module):
-    def __init__(self, block, layers, in_features=256, num_classes=1000, num_domains=2, cut_conv=4):
-        feature_dict = {1: 64, 2: 128, 3: 256, 4: 512}
-        self.cut_conv = cut_conv
+    def __init__(self, block, layers, in_features=256, num_classes=1000, num_domains=2):
         self.inplanes = 64
         self.in_features = in_features
         self.num_domains = num_domains
@@ -238,18 +236,15 @@ class DSBNResNet(nn.Module):
         self.relu = nn.ReLU(inplace=True)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
         self.layer1 = self._make_layer(block, 64, layers[0], num_domains=self.num_domains)
-        if self.cut_conv > 1:
-            self.layer2 = self._make_layer(block, 128, layers[1], stride=2, num_domains=self.num_domains)
-        if self.cut_conv > 2:
-            self.layer3 = self._make_layer(block, 256, layers[2], stride=2, num_domains=self.num_domains)
-        if self.cut_conv > 3:
-            self.layer4 = self._make_layer(block, 512, layers[3], stride=2, num_domains=self.num_domains)
+        self.layer2 = self._make_layer(block, 128, layers[1], stride=2, num_domains=self.num_domains)
+        self.layer3 = self._make_layer(block, 256, layers[2], stride=2, num_domains=self.num_domains)
+        self.layer4 = self._make_layer(block, 512, layers[3], stride=2, num_domains=self.num_domains)
         # self.avgpool = nn.AvgPool2d(7, stride=1)
         if self.in_features != 0:
-            self.fc1 = nn.Linear(feature_dict[self.cut_conv] * block.expansion, self.in_features)
+            self.fc1 = nn.Linear(512 * block.expansion, self.in_features)
             self.fc2 = nn.Linear(self.in_features, num_classes)
         else:
-            self.fc = nn.Linear(feature_dict[self.cut_conv] * block.expansion, num_classes)
+            self.fc = nn.Linear(512 * block.expansion, num_classes)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d) or isinstance(m, Conv2d):
@@ -286,12 +281,9 @@ class DSBNResNet(nn.Module):
         x = self.relu(x)
         x = self.maxpool(x)
         x, _ = self.layer1(x, domain_label)
-        if self.cut_conv > 1:
-            x, _ = self.layer2(x, domain_label)
-        if self.cut_conv > 2:
-            x, _ = self.layer3(x, domain_label)
-        if self.cut_conv > 3:
-            x, _ = self.layer4(x, domain_label)
+        x, _ = self.layer2(x, domain_label)
+        x, _ = self.layer3(x, domain_label)
+        x, _ = self.layer4(x, domain_label)
 
         x = x.mean(3).mean(2)  # global average pooling
         x = x.view(x.size(0), -1)

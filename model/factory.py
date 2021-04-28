@@ -70,11 +70,11 @@ def get_model(model_name, num_classes, in_features=0, num_domains=2, pretrained=
                              pretrained=pretrained, num_domains=num_domains)
 
 
-def load_model(model_name, num_classes, in_features, num_domains, pretrained=False, cut_conv=4):
+def load_model(model_name, num_classes, in_features, num_domains, pretrained=False):
     if model_name == 'resnet18dsbn':
         model = resnetdsbn.resnet18dsbn(pretrained=pretrained, num_classes=num_classes, in_features=in_features,
-                                        num_domains=num_domains, cut_conv=cut_conv)
+                                        num_domains=num_domains)
     elif model_name == 'resnet50dsbn':
         model = resnetdsbn.resnet50dsbn(pretrained=pretrained, num_classes=num_classes, in_features=in_features,
-                                        num_domains=num_domains, cut_conv=cut_conv)
+                                        num_domains=num_domains)
     return model
