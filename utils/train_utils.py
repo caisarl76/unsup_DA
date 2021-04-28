@@ -38,7 +38,7 @@ def test(args, model, val_dataset, domain_num):
 
             pred_y = model(x_val, domain_num * torch.ones_like(y_val), with_ft=False)
             pred_ys.append(pred_y.cpu())
-            break
+
     pred_ys = torch.cat(pred_ys, 0)
     y_vals = torch.cat(y_vals, 0)
     val_acc = float(eval_utils.accuracy(pred_ys, y_vals, topk=(1,))[0])
