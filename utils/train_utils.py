@@ -124,11 +124,11 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
                 print('%d iter accuracy: %0.3f' % (i, acc))
 
             model.train(True)
-
+            model = model.cuda(args.gpu)
 
     model, acc = test(args, model, val_dataset, domain_num)
     model.train(True)
-
+    model = model.cuda(args.gpu)
     print('final acc: %0.3f' % (acc))
 
     writer.flush()
