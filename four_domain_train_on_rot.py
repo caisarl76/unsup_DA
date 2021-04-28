@@ -21,7 +21,10 @@ from utils import io_utils, eval_utils
 
 save_root = '/media/hd/jihun/dsbn_result/new/'
 
-domain_dict = {'RealWorld': 0, 'Art': 1, 'Clipart': 2, 'Product': 3}
+# domain_dict = {'RealWorld': 0, 'Art': 1, 'Clipart': 2, 'Product': 3}
+data_pth_dict = {'office-home': 'OfficeHomeDataset_10072016', 'domainnet': 'domainnet'}
+domain_dict = {'office-home': {'RealWorld': 0, 'Art': 1, 'Clipart': 2, 'Product': 3},
+               'domainnet': {'clipart': 0, 'infograph': 1, 'painting': 2, 'quickdraw': 3, 'real': 4, 'sketch': 5}}
 
 
 def parse_args(args=None, namespace=None):

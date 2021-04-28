@@ -42,6 +42,7 @@ def parse_args(args=None, namespace=None):
                         help='learning_rate scheduler [Lambda/Multiplicate/Step/Multistep/Expo', type=str)
     parser.add_argument('--weight-decay', help='weight decay', default=0.0, type=float)
 
+    parser.add_argument("--ssl", action='store_true')
     parser.add_argument("--stage", type=int, default=1)
 
     args = parser.parse_args(args=args, namespace=namespace)
@@ -56,8 +57,10 @@ def main():
     if (args.save_root):
         save_root = args.save_root
 
-    trg_train, trg_val = get_dataset(dataset=args.dataset, dataset_root=args.data_root, domain=args.trg_domain,
+    trg_ssl_train, trg_ssl_val = get_dataset(dataset=args.dataset, dataset_root=args.data_root, domain=args.trg_domain,
                                      ssl=True)
+    trg_sup_train, trg_sup_val = get_dataset(dataset=args.dataset, dataset_root=args.data_root, domain=args.trg_domain,
+                                             ssl=False)
     trg_num = domain_dict[args.dataset][args.trg_domain]
     src_train, src_val = get_dataset(dataset=args.dataset, dataset_root=args.data_root, domain=args.src_domain,
                                      ssl=False)
@@ -67,8 +70,10 @@ def main():
         os.makedirs(save_dir, exist_ok=True)
     #################################### STAGE 1 ####################################
     if stage == 1:
-        model = get_rot_model(args.model_name, num_domains=6)
-        model = normal_train(args, model, trg_train, trg_val, args.iters[0], save_dir, args.trg_domain)
+
+        if(args.ssl):
+            model = get_rot_model(args.model_name, num_domains=6)
+            model = normal_train(args, model, trg_ssl_train, trg_ssl_val, args.iters[0], save_dir, args.trg_domain)
 
         stage += 1
 
