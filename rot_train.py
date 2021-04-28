@@ -65,10 +65,10 @@ def main():
     num_domain = 4
     num_classes = 65
 
-    if (args.dataset == 'domainnet'):
+    if args.dataset == 'domainnet':
         num_domain = 6
         num_classes = 345
-    elif (args.dataset == 'office-home'):
+    elif args.dataset == 'office-home':
         num_domain = 4
         num_classes = 65
 
