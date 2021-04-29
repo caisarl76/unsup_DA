@@ -102,7 +102,7 @@ def main():
 
         src_bn = 'bns.' + (str)(src_num)
         trg_bn = 'bns.' + (str)(trg_num)
-        print('src bn: %s, || trg bn: %s '%(src_bn, trg_bn))
+
         weight_dict = OrderedDict()
         for name, p in model.named_parameters():
             if (trg_bn in name):
