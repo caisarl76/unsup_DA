@@ -97,9 +97,8 @@ def main():
             iter = i * 20000 + 10000
             # iter = i * 2 + 1
             pre = torch.load(join(save_dir, '%d_weight.ckpt' % (iter)))
-            model = load_model(args.model_name, in_features=class_dict[args.dataset],
-                               num_classes=class_dict[args.dataset],
-                               num_domains=6, pretrained=True)
+            model = load_model(args.model_name, in_features=num_classes, num_classes=num_classes,
+                               num_domains=num_domain, pretrained=True)
 
             new_pre = OrderedDict()
             for key in pre.keys():
@@ -115,11 +114,11 @@ def main():
             model.fc1.weight.requires_grad = True
             model.fc2.weight.requires_grad = True
 
-            save_dir = join(save_root, args.save_dir, 'stage2_%d' % (iter))
-            if not os.path.isdir(save_dir):
-                os.makedirs(save_dir, exist_ok=True)
+            save_dir_iter = join(save_root, args.save_dir, 'stage2_%d' % (iter))
+            if not os.path.isdir(save_dir_iter):
+                os.makedirs(save_dir_iter, exist_ok=True)
 
-            model = normal_train(args, model, train_dataset, val_dataset, args.iters[1], save_dir, args.domain)
+            model = normal_train(args, model, train_dataset, val_dataset, args.iters[1], save_dir_iter, args.domain)
 
         pre = torch.load(join(save_dir, 'best_model.ckpt'))
 
