@@ -64,7 +64,7 @@ def main():
 
     model = model.cuda(args.gpu)
     _, acc = test(args, model, trg_sup_val, domain_dict[args.dataset][args.trg_domain])
-    print(acc)
+    print('acc: %0.3f'%(acc))
 
 if __name__ == '__main__':
     main()
