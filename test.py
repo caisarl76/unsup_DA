@@ -52,6 +52,7 @@ def main():
         num_domain = 4
         num_classes = 65
 
+    print(args.dataset, num_classes, num_domain)
     _, trg_sup_val = get_dataset(dataset=args.dataset, dataset_root=args.data_root, domain=args.trg_domain,
                                              ssl=False)
 
