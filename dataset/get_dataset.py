@@ -8,15 +8,15 @@ from rot_dataset.rot_dataset import rot_dataset
 from dataset.datasets import OFFICEHOME_multi
 from dataset.domainnet import get_domainnet_dloader
 
-data_pth_dict = {'office-home': 'OfficeHomeDataset_10072016', 'domainnet': 'domainnet'}
-domain_dict = {'office-home': {'RealWorld': 0, 'Art': 1, 'Clipart': 2, 'Product': 3},
+data_pth_dict = {'officehome': 'OfficeHomeDataset_10072016', 'domainnet': 'domainnet'}
+domain_dict = {'officehome': {'RealWorld': 0, 'Art': 1, 'Clipart': 2, 'Product': 3},
                'domainnet': {'clipart': 0, 'infograph': 1, 'painting': 2, 'quickdraw': 3, 'real': 4, 'sketch': 5}}
 
 
-def get_dataset(dataset='office-home', dataset_root='/data', domain='RealWorld', ssl=False):
+def get_dataset(dataset='officehome', dataset_root='/data', domain='RealWorld', ssl=False):
     domain_num_dict = domain_dict[dataset]
     data_pth = join(dataset_root, data_pth_dict[dataset])
-    if (dataset == 'office-home'):
+    if (dataset == 'officehome'):
         if ssl:
             train_dataset = rot_dataset(data_pth, 1, [domain], split='train')
             val_dataset = rot_dataset(data_pth, 1, [domain], split='val')

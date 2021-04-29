@@ -12,8 +12,8 @@ from dataset.get_dataset import get_dataset
 # domain_dict = {'RealWorld': 1, 'Clipart': 0}
 root = '/media/hd/jihun/dsbn_result/'
 
-data_pth_dict = {'office-home': 'OfficeHomeDataset_10072016', 'domainnet': 'domainnet'}
-domain_dict = {'office-home': {'RealWorld': 0, 'Art': 1, 'Clipart': 2, 'Product': 3},
+data_pth_dict = {'officehome': 'OfficeHomeDataset_10072016', 'domainnet': 'domainnet'}
+domain_dict = {'officehome': {'RealWorld': 0, 'Art': 1, 'Clipart': 2, 'Product': 3},
                'domainnet': {'clipart': 0, 'infograph': 1, 'painting': 2, 'quickdraw': 3, 'real': 4, 'sketch': 5}}
 
 
@@ -61,7 +61,7 @@ def main():
     if args.dataset == 'domainnet':
         num_domain = 6
         num_classes = 345
-    elif args.dataset == 'office-home':
+    elif args.dataset == 'officehome':
         num_domain = 4
         num_classes = 65
 
