@@ -44,6 +44,7 @@ def parse_args(args=None, namespace=None):
 
     parser.add_argument("--ssl", action='store_true')
     parser.add_argument("--stage", type=int, default=1)
+    parser.add_argument("--proceed", help='proceed to next stage', default=True, type=bool)
 
     args = parser.parse_args(args=args, namespace=namespace)
     return args
@@ -80,6 +81,7 @@ def main():
     save_dir = join(save_root, args.save_dir, 'stage1')
     if not os.path.isdir(save_dir):
         os.makedirs(save_dir, exist_ok=True)
+    model = None
     #################################### STAGE 1 ####################################
     if stage == 1:
 
@@ -90,7 +92,8 @@ def main():
             model = load_model(args.model_name, in_features=num_classes, num_classes=num_classes,
                                num_domains=num_domain, pretrained=True)
             model = normal_train(args, model, trg_sup_train, trg_sup_val, args.iters[0], save_dir, args.trg_domain)
-        stage += 1
+        if args.proceed:
+            stage += 1
 
     #################################### STAGE 2 ####################################
     if stage == 2:
@@ -129,12 +132,12 @@ def main():
 
         model = normal_train(args, model, src_train, src_val, args.iters[1], save_dir, args.src_domain)
 
-        #################################### STAGE 3 ####################################
+    #################################### STAGE 3 ####################################
 
-        _, stage3_acc = test(args, model, trg_sup_val, domain_dict[args.dataset][args.trg_domain])
-        print('####################################')
-        print('### stage 3 at stage1 iter: best', '||  %0.3f' % (stage3_acc))
-        print('####################################')
+    _, stage3_acc = test(args, model, trg_sup_val, domain_dict[args.dataset][args.trg_domain])
+    print('####################################')
+    print('### stage 3 at stage1 iter: best', '||  %0.3f' % (stage3_acc))
+    print('####################################')
 
 
 if __name__ == '__main__':
