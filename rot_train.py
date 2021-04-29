@@ -94,9 +94,11 @@ def main():
                                                  ssl=False)
 
         for i in range(4):
+
             iter = i * 20000 + 10000
             # iter = i * 2 + 1
             pre = torch.load(join(save_dir, '%d_weight.ckpt' % (iter)))
+            print('load weight: ', join(save_dir, '%d_weight.ckpt' % (iter)))
             model = load_model(args.model_name, in_features=num_classes, num_classes=num_classes,
                                num_domains=num_domain, pretrained=True)
 
