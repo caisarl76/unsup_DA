@@ -94,11 +94,11 @@ def main():
 
     #################################### STAGE 2 ####################################
     if stage == 2:
-        if args.ssl:
-            pre = torch.load(join(save_dir, 'best_model.ckpt'))
-            model = load_model(args.model_name, in_features=num_classes, num_classes=num_classes,
-                               num_domains=num_domain, pretrained=True)
-            model.load_state_dict(pre, strict=False)
+
+        pre = torch.load(join(save_dir, 'best_model.ckpt'))
+        model = load_model(args.model_name, in_features=num_classes, num_classes=num_classes,
+                           num_domains=num_domain, pretrained=True)
+        model.load_state_dict(pre, strict=False)
 
         src_bn = 'bns.' + (str)(src_num)
         trg_bn = 'bns.' + (str)(trg_num)
