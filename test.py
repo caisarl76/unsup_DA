@@ -27,10 +27,6 @@ def parse_args(args=None, namespace=None):
                         default='domainnet', type=str)
     parser.add_argument('--data-root', help='directory where dataset exists',
                         default='/data/', type=str)
-    parser.add_argument('--save-root', help='directory to save models', default='/results/result/rot_ssl/', type=str)
-    # parser.add_argument('--save-root', help='directory to save models', default='/media/hd/jihun/dsbn_result/', type=str)
-
-    parser.add_argument('--save-dir', help='directory to save models', default='domainnet/clipart_sketch', type=str)
     parser.add_argument('--model-path', help='directory to save models', default='result/try1/best_model.ckpt',
                         type=str)
     parser.add_argument('--model-name', help='model name', default='resnet50dsbn')
@@ -48,8 +44,6 @@ def parse_args(args=None, namespace=None):
 def main():
     args = parse_args()
     torch.cuda.set_device(args.gpu)
-    save_root = root
-    stage = args.stage
 
     if args.dataset == 'domainnet':
         num_domain = 6
