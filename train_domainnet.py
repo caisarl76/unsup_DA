@@ -4,7 +4,7 @@ from os.path import join as join
 import torch
 from collections import OrderedDict
 from model.rot_resnetdsbn import get_rot_model
-from model.factory import get_model
+from model.factory import get_model, load_model
 from utils.train_utils import normal_train, test
 
 from dataset.get_dataset import get_dataset
@@ -54,6 +54,17 @@ def main():
     torch.cuda.set_device(args.gpu)
     save_root = root
     stage = args.stage
+
+    num_domain = 4
+    num_classes = 65
+
+    if args.dataset == 'domainnet':
+        num_domain = 6
+        num_classes = 345
+    elif args.dataset == 'office-home':
+        num_domain = 4
+        num_classes = 65
+
     if (args.save_root):
         save_root = args.save_root
 
@@ -65,6 +76,7 @@ def main():
     src_train, src_val = get_dataset(dataset=args.dataset, dataset_root=args.data_root, domain=args.src_domain,
                                      ssl=False)
     src_num = domain_dict[args.dataset][args.src_domain]
+
     save_dir = join(save_root, args.save_dir, 'stage1')
     if not os.path.isdir(save_dir):
         os.makedirs(save_dir, exist_ok=True)
@@ -72,10 +84,11 @@ def main():
     if stage == 1:
 
         if args.ssl:
-            model = get_rot_model(args.model_name, num_domains=6)
+            model = load_model(args.model_name, in_features=256, num_classes=4, num_domains=num_domain, pretrained=True)
             model = normal_train(args, model, trg_ssl_train, trg_ssl_val, args.iters[0], save_dir, args.trg_domain)
         else:
-            model = get_model(args.model_name, in_features=345, num_classes=345, num_domains=6)
+            model = load_model(args.model_name, in_features=num_classes, num_classes=num_classes,
+                               num_domains=num_domain, pretrained=True)
             model = normal_train(args, model, trg_sup_train, trg_sup_val, args.iters[0], save_dir, args.trg_domain)
         stage += 1
 
@@ -83,7 +96,8 @@ def main():
     if stage == 2:
         if args.ssl:
             pre = torch.load(join(save_dir, 'best_model.ckpt'))
-            model = get_model(args.model_name, in_features=345, num_classes=345, num_domains=6)
+            model = load_model(args.model_name, in_features=num_classes, num_classes=num_classes,
+                               num_domains=num_domain, pretrained=True)
             model.load_state_dict(pre, strict=False)
 
         src_bn = 'bns.' + (str)(src_num)
@@ -91,7 +105,6 @@ def main():
 
         weight_dict = OrderedDict()
         for name, p in model.named_parameters():
-            p.requires_grad = False
             if (trg_bn in name):
                 weight_dict[name] = p
                 new_name = name.replace(trg_bn, src_bn)
@@ -101,6 +114,9 @@ def main():
             else:
                 weight_dict[name] = p
         model.load_state_dict(weight_dict, strict=False)
+
+        for name, p in model.named_parameters():
+            p.requires_grad = False
 
         model.fc1.weight.requires_grad = True
         model.fc2.weight.requires_grad = True
