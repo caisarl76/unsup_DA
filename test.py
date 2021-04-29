@@ -60,6 +60,8 @@ def main():
     model = load_model(args.model_name, in_features=num_classes, num_classes=num_classes,
                        num_domains=num_domain, pretrained=True)
     model.load_state_dict(torch.load(args.model_path)['model'])
+
+    model = model.cuda(args.gpu)
     _, acc = test(args, model, trg_sup_val, domain_dict[args.dataset][args.trg_domain])
     print(acc)
 
