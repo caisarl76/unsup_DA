@@ -120,6 +120,8 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
 
                 # save best checkpoint
                 io_utils.save_check(save_dir, i, model_dict, optimizer_dict, best=True)
+            if (i % 2000 == 0 and i != 0):
+                print('%d iter accuracy: %0.3f' % (i, acc))
             if (i % 20000 == 10000 and i != 0):
             # if (i % 2 == 1 and i != 0):
                 print('%d iter accuracy: %0.3f' % (i, acc))
