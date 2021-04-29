@@ -97,7 +97,12 @@ def main():
 
             iter = i * 20000 + 10000
             # iter = i * 2 + 1
-            pre = torch.load(join(save_dir, '%d_weight.ckpt' % (iter)))
+            model_pth = join(save_dir, '%d_weight.ckpt' % (iter))
+            if(os.path.isfile(model_pth)):
+                pre = torch.load(model_pth)
+            else:
+                print('no weight exists: ', model_pth)
+                break
             print('load weight: ', join(save_dir, '%d_weight.ckpt' % (iter)))
             model = load_model(args.model_name, in_features=num_classes, num_classes=num_classes,
                                num_domains=num_domain, pretrained=True)
