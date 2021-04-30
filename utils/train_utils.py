@@ -47,7 +47,8 @@ def test(args, model, val_dataset, domain_num):
     return model, val_acc
 
 
-def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain, freeze=False, save_model=False):
+def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain, freeze=False, save_model=False,
+                 test_datset=None, test_domain=None):
     # print(freeze)
     domain_dict = domain_lib[args.dataset]
     train_dataloader = util_data.DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True,
@@ -62,7 +63,7 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
     optimizer = optim.Adam(params, betas=(0.9, 0.999))
     ce_loss = nn.CrossEntropyLoss()
     # lr_scheduler = LRScheduler(args.learning_rate, 5e-6, 0,
-    lr_scheduler=LRScheduler(args.learning_rate, 5e-6, 5000,
+    lr_scheduler = LRScheduler(args.learning_rate, 5e-6, 5000,
                                num_steps=iter,
                                alpha=10, beta=0.75, double_bias_lr=True,
                                base_weight_factor=0.1)
@@ -74,6 +75,9 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
 
     writer = SummaryWriter(log_dir=join(save_dir, 'logs'))
     domain_num = domain_dict[domain]
+    if test_datset:
+        test_domain_num = domain_dict[test_domain]
+
     print('domain: %s, %d' % (domain, domain_num))
     global best_accuracy
     global best_accuracies_each_c
@@ -121,9 +125,13 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
                 # save best checkpoint
                 io_utils.save_check(save_dir, i, model_dict, optimizer_dict, best=True)
             if (i % 2000 == 0 and i != 0):
-                print('%d iter accuracy: %0.3f' % (i, acc))
+                if test_datset:
+                    _, test_acc = test(args, model, test_datset, test_domain_num)
+                    print('%d iter accuracy: %0.3f || %0.3f' % (i, acc * 100, test_acc * 100))
+                else:
+                    print('%d iter accuracy: %0.3f' % (i, acc))
             if (i % 20000 == 10000 and i != 0):
-            # if (i % 2 == 1 and i != 0):
+                # if (i % 2 == 1 and i != 0):
                 print('%d iter accuracy: %0.3f' % (i, acc))
                 if save_model:
                     model_dict = {'model': model.cpu().state_dict()}
