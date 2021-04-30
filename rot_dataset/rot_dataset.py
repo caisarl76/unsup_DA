@@ -89,7 +89,6 @@ class rot_dataset(data.Dataset):
 def make_dataset(dirs, transform, class_to_idx, extensions, include_dir=False):
     items = []
     for dir in dirs:
-        print(dir)
         dir = os.path.expanduser(dir)
         for target in sorted(os.listdir(dir)):
             d = os.path.join(dir, target)
