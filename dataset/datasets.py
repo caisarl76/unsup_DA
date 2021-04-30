@@ -664,6 +664,7 @@ class OFFICEHOME_multi(data.Dataset):
         else:
             self.transform = office_val_transform
         self.target_transform = target_transform
+        print('supervised dataset of domain: %s'%(self.domain))
 
     def __getitem__(self, index):
         """
