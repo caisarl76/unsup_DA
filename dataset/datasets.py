@@ -696,7 +696,7 @@ class OFFICEHOME_multi(data.Dataset):
         return fmt_str
 
 
-def make_dataset(dirs, class_to_idx, extensions, list_file=None, include_dir=False):
+def make_dataset(dirs, class_to_idx, extensions):
     images = []
 
     for dir in dirs:

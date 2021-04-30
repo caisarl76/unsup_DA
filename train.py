@@ -67,8 +67,6 @@ def main():
     if (args.save_root):
         save_root = args.save_root
 
-    trg_ssl_train, trg_ssl_val = get_dataset(dataset=args.dataset, dataset_root=args.data_root, domain=args.trg_domain,
-                                             ssl=True)
     trg_sup_train, trg_sup_val = get_dataset(dataset=args.dataset, dataset_root=args.data_root, domain=args.trg_domain,
                                              ssl=False)
     trg_num = domain_dict[args.dataset][args.trg_domain]
@@ -89,6 +87,9 @@ def main():
                     os.makedirs(save_dir, exist_ok=True)
                 model = load_model(args.model_name, in_features=256, num_classes=4, num_domains=num_domain,
                                    pretrained=True)
+                trg_ssl_train, trg_ssl_val = get_dataset(dataset=args.dataset, dataset_root=args.data_root,
+                                                         domain=args.trg_domain,
+                                                         ssl=True)
                 print('train stage 1')
                 model = normal_train(args, model, trg_ssl_train, trg_ssl_val, args.iters[0], save_dir, args.trg_domain)
         else:
