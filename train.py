@@ -44,7 +44,7 @@ def parse_args(args=None, namespace=None):
 
     parser.add_argument("--ssl", action='store_true')
     parser.add_argument("--stage", type=int, default=1)
-    parser.add_argument("--proceed", help='proceed to next stage', default=True, type=bool)
+    parser.add_argument("--proceed", help='proceed to next stage', action='store_true')
 
     args = parser.parse_args(args=args, namespace=namespace)
     return args
