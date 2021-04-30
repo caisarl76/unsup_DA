@@ -64,7 +64,6 @@ class rot_dataset(data.Dataset):
         self.classes = [0, 1, 2, 3]
 
         self.class_to_idx = {cls: i for i, cls in enumerate(self.classes)}
-        print('make dataset')
         self.samples = make_dataset(domain_root_dir, self.transform, self.class_to_idx, self.extensions)
         if len(self.samples) == 0:
             raise (RuntimeError("Found 0 files in subfolders of: " + domain_root_dir + "\n" +
