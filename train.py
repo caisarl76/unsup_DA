@@ -24,11 +24,9 @@ def parse_args(args=None, namespace=None):
     parser.add_argument('--data-root', help='directory where dataset exists',
                         default='/data/', type=str)
     parser.add_argument('--save-root', help='directory to save models', default='/results/result/rot_ssl/', type=str)
-    # parser.add_argument('--save-root', help='directory to save models', default='/media/hd/jihun/dsbn_result/', type=str)
-
     parser.add_argument('--save-dir', help='directory to save models', default='domainnet/clipart_sketch', type=str)
-
     parser.add_argument('--model-name', default='resnet50dsbn', type=str)
+    parser.add_argument('--model-path', default='path for stage2 train', type=str)
     parser.add_argument('--trg-domain', help='target training dataset', default='clipart')
     parser.add_argument('--src-domain', help='target training dataset', default='sketch')
 
@@ -97,8 +95,10 @@ def main():
 
     #################################### STAGE 2 ####################################
     if stage == 2:
-
-        pre = torch.load(join(save_dir, 'best_model.ckpt'))
+        if args.stage == 1:
+            pre = torch.load(join(save_dir, 'best_model.ckpt'))
+        else:
+            model_path =
         model = load_model(args.model_name, in_features=num_classes, num_classes=num_classes,
                            num_domains=num_domain, pretrained=True)
         model.load_state_dict(pre, strict=False)
