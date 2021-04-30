@@ -74,7 +74,7 @@ class rot_dataset(data.Dataset):
         self.loader = Image.open
         for i in range(num_domains):
             self.domain = domain[i]
-        print('load dataset complete')
+        print('rotation dataset of domain: %s'%(self.domain))
 
     def __getitem__(self, index):
         path, angle = self.samples[index]

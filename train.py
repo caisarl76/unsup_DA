@@ -136,7 +136,7 @@ def main():
 
     _, stage3_acc = test(args, model, trg_sup_val, domain_dict[args.dataset][args.trg_domain])
     print('####################################')
-    print('### stage 3 at stage1 iter: best', '||  %0.3f' % (stage3_acc))
+    print('### stage 3 at stage1 iter: %0.3f' % (stage3_acc))
     print('####################################')
 
 
