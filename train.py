@@ -87,14 +87,18 @@ def main():
                 os.makedirs(save_dir, exist_ok=True)
 
             model = load_model(args.model_name, in_features=256, num_classes=4, num_domains=num_domain, pretrained=True)
-            model = normal_train(args, model, trg_ssl_train, trg_ssl_val, args.iters[0], save_dir, args.trg_domain)
+            if not os.path.isfile(join(save_dir, 'best_model.ckpt')):
+                print('train stage 1')
+                model = normal_train(args, model, trg_ssl_train, trg_ssl_val, args.iters[0], save_dir, args.trg_domain)
         else:
             save_dir = join(save_root, 'stage1/sup/', args.trg_domain)
             if not os.path.isdir(save_dir):
                 os.makedirs(save_dir, exist_ok=True)
             model = load_model(args.model_name, in_features=num_classes, num_classes=num_classes,
                                num_domains=num_domain, pretrained=True)
-            model = normal_train(args, model, trg_sup_train, trg_sup_val, args.iters[0], save_dir, args.trg_domain)
+            if not os.path.isfile(join(save_dir, 'best_model.ckpt')):
+                print('train stage 1')
+                model = normal_train(args, model, trg_sup_train, trg_sup_val, args.iters[0], save_dir, args.trg_domain)
         if args.proceed:
             stage += 1
 
