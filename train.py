@@ -105,6 +105,7 @@ def main():
 
     #################################### STAGE 2 ####################################
     if stage == 2:
+        print('train stage 2')
         if args.ssl:
             pre = torch.load(join(save_root, 'stage1/rot/', args.trg_domain, 'best_model.ckpt'))
             save_dir = join(save_root, 'stage2/rot', args.save_dir)
