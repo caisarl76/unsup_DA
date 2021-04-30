@@ -101,9 +101,9 @@ def main():
     #################################### STAGE 2 ####################################
     if stage == 2:
         if args.ssl:
-            pre = torch.load(join(save_root, 'stage1/ssl', 'best_model.ckpt'))
+            pre = torch.load(join(save_root, 'stage1/ssl', args.trg_domain, 'best_model.ckpt'))
         else:
-            pre = torch.load(join(save_root, 'stage1/sup', 'best_model.ckpt'))
+            pre = torch.load(join(save_root, 'stage1/sup', args.trg_domain, 'best_model.ckpt'))
 
         model = load_model(args.model_name, in_features=num_classes, num_classes=num_classes,
                            num_domains=num_domain, pretrained=True)
