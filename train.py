@@ -98,7 +98,7 @@ def main():
         if args.stage == 1:
             pre = torch.load(join(save_dir, 'best_model.ckpt'))
         else:
-            model_path =
+            pre = torch.load(args.model_path)
         model = load_model(args.model_name, in_features=num_classes, num_classes=num_classes,
                            num_domains=num_domain, pretrained=True)
         model.load_state_dict(pre, strict=False)
