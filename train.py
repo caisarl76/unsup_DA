@@ -76,17 +76,22 @@ def main():
                                      ssl=False)
     src_num = domain_dict[args.dataset][args.src_domain]
 
-    save_dir = join(save_root, args.save_dir, 'stage1')
-    if not os.path.isdir(save_dir):
-        os.makedirs(save_dir, exist_ok=True)
+    save_dir = None
     model = None
+
     #################################### STAGE 1 ####################################
     if stage == 1:
-
         if args.ssl:
+            save_dir = join(save_root, 'stage1/ssl', args.trg_domain)
+            if not os.path.isdir(save_dir):
+                os.makedirs(save_dir, exist_ok=True)
+
             model = load_model(args.model_name, in_features=256, num_classes=4, num_domains=num_domain, pretrained=True)
             model = normal_train(args, model, trg_ssl_train, trg_ssl_val, args.iters[0], save_dir, args.trg_domain)
         else:
+            save_dir = join(save_root, 'stage1/sup', args.trg_domain)
+            if not os.path.isdir(save_dir):
+                os.makedirs(save_dir, exist_ok=True)
             model = load_model(args.model_name, in_features=num_classes, num_classes=num_classes,
                                num_domains=num_domain, pretrained=True)
             model = normal_train(args, model, trg_sup_train, trg_sup_val, args.iters[0], save_dir, args.trg_domain)
@@ -95,10 +100,11 @@ def main():
 
     #################################### STAGE 2 ####################################
     if stage == 2:
-        if args.stage == 1:
-            pre = torch.load(join(save_dir, 'best_model.ckpt'))
+        if args.ssl:
+            pre = torch.load(join(save_root, 'stage1/ssl', 'best_model.ckpt'))
         else:
-            pre = torch.load(args.model_path)
+            pre = torch.load(join(save_root, 'stage1/sup', 'best_model.ckpt'))
+
         model = load_model(args.model_name, in_features=num_classes, num_classes=num_classes,
                            num_domains=num_domain, pretrained=True)
         model.load_state_dict(pre, strict=False)
