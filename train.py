@@ -82,7 +82,7 @@ def main():
     #################################### STAGE 1 ####################################
     if stage == 1:
         if args.ssl:
-            save_dir = join(save_root, 'stage1/ssl/', args.trg_domain)
+            save_dir = join(save_root, 'stage1/rot/', args.trg_domain)
             if not os.path.isdir(save_dir):
                 os.makedirs(save_dir, exist_ok=True)
 
@@ -101,7 +101,7 @@ def main():
     #################################### STAGE 2 ####################################
     if stage == 2:
         if args.ssl:
-            pre = torch.load(join(save_root, 'stage1/ssl/', args.trg_domain, 'best_model.ckpt'))
+            pre = torch.load(join(save_root, 'stage1/rot/', args.trg_domain, 'best_model.ckpt'))
         else:
             pre = torch.load(join(save_root, 'stage1/sup/', args.trg_domain, 'best_model.ckpt'))
 
