@@ -106,8 +106,10 @@ def main():
     if stage == 2:
         if args.ssl:
             pre = torch.load(join(save_root, 'stage1/rot/', args.trg_domain, 'best_model.ckpt'))
+            save_dir = join(save_root, 'stage2/rot', args.save_dir)
         else:
             pre = torch.load(join(save_root, 'stage1/sup/', args.trg_domain, 'best_model.ckpt'))
+            save_dir = join(save_root, 'stage2/sup', args.save_dir)
 
         model = load_model(args.model_name, in_features=num_classes, num_classes=num_classes,
                            num_domains=num_domain, pretrained=True)
@@ -136,7 +138,6 @@ def main():
         torch.nn.init.xavier_uniform_(model.fc1.weight)
         torch.nn.init.xavier_uniform_(model.fc2.weight)
 
-        save_dir = join(save_root, args.save_dir, 'stage2')
         if not os.path.isdir(save_dir):
             os.makedirs(save_dir, exist_ok=True)
 
