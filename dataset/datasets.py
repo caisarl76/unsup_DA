@@ -631,7 +631,7 @@ class OFFICEHOME_multi(data.Dataset):
         samples (list): List of (sample path, class_index) tuples
     """
 
-    def __init__(self, root, num_domain, domain, list_file=None, split='train', target_transform=None):
+    def __init__(self, root, num_domain, domain, split='train', target_transform=None):
 
         self.extensions = ['jpg', 'jpeg', 'png']
         domain_root_dir = []
@@ -647,7 +647,7 @@ class OFFICEHOME_multi(data.Dataset):
                    'Soda', 'Speaker', 'Spoon', 'TV', 'Table', 'Telephone', 'ToothBrush', 'Toys', 'Trash_Can', 'Webcam']
 
         class_to_idx = {cls: i for i, cls in enumerate(classes)}
-        samples = make_dataset(domain_root_dir, class_to_idx, self.extensions, list_file=list_file)
+        samples = make_dataset(domain_root_dir, class_to_idx, self.extensions)
         if len(samples) == 0:
             raise (RuntimeError("Found 0 files in subfolders of: " + root + "\n" +
                                 "Supported extensions are: " + ",".join(self.extensions)))
