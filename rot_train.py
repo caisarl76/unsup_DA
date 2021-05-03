@@ -50,6 +50,7 @@ def parse_args(args=None, namespace=None):
     parser.add_argument('--weight-decay', help='weight decay', default=0.0, type=float)
 
     parser.add_argument("--stage", type=int, default=1)
+    parser.add_argument("--onlyfc", action='store_true')
 
     args = parser.parse_args(args=args, namespace=namespace)
     return args
@@ -141,9 +142,9 @@ def main():
                 new_pre[key] = pre[key]
 
         model.load_state_dict(new_pre, strict=False)
-
-        # for name, p in model.named_parameters():
-        #     p.requires_grad = False
+        if args.onlyfc:
+            for name, p in model.named_parameters():
+                p.requires_grad = False
 
         torch.nn.init.xavier_uniform_(model.fc1.weight)
         torch.nn.init.xavier_uniform_(model.fc2.weight)
