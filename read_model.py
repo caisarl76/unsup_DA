@@ -15,6 +15,7 @@ def main():
                        pretrained=True)
     pre = torch.load(pth)['model']
     model.load_state_dict(pre)
+    print(model)
     # print(model)
     # new_pre = OrderedDict()
     # for key in pre.keys():
