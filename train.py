@@ -122,7 +122,7 @@ def main():
             save_dir = join(save_root, 'stage2/sup', args.save_dir)
 
         model = load_model(args.model_name, in_features=num_classes, num_classes=num_classes,
-                           num_domains=num_domain, pretrained=True)
+                           num_domains=num_domain, pretrained=False)
         model.load_state_dict(pre, strict=False)
 
         src_bn = 'bns.' + (str)(src_num)

@@ -143,6 +143,7 @@ def main():
 
         model.load_state_dict(new_pre, strict=False)
         if args.onlyfc:
+            print('train only fc layer')
             for name, p in model.named_parameters():
                 p.requires_grad = False
 
