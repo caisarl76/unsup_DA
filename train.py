@@ -111,10 +111,14 @@ def main():
     if stage == 2:
         print('train stage 2')
         if args.ssl:
-            pre = torch.load(join(save_root, 'stage1/rot/', args.trg_domain, 'best_model.ckpt'))
+            model_pth = join(save_root, 'stage1/rot/', args.trg_domain, 'best_model.ckpt')
+            print('load model from %s' % (model_pth))
+            pre = torch.load(model_pth)
             save_dir = join(save_root, 'stage2/rot', args.save_dir)
         else:
-            pre = torch.load(join(save_root, 'stage1/sup/', args.trg_domain, 'best_model.ckpt'))
+            model_pth = join(save_root, 'stage1/sup/', args.trg_domain, 'best_model.ckpt')
+            print('load model from %s' % (model_pth))
+            pre = torch.load(model_pth)
             save_dir = join(save_root, 'stage2/sup', args.save_dir)
 
         model = load_model(args.model_name, in_features=num_classes, num_classes=num_classes,
