@@ -127,7 +127,7 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
             if (i % 2000 == 0 and i != 0):
                 if test_datset:
                     _, test_acc = test(args, model, test_datset, test_domain_num)
-                    print('%d iter accuracy: %0.3f || %0.3f' % (i, acc * 100, test_acc * 100))
+                    print('%d iter accuracy: src: %0.3f || trg: %0.3f' % (i, acc * 100, test_acc * 100))
                 else:
                     print('%d iter accuracy: %0.3f' % (i, acc))
             if (i % 20000 == 10000 and i != 0):
