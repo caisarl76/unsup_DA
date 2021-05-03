@@ -78,7 +78,7 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
     if test_datset:
         test_domain_num = domain_dict[test_domain]
 
-    print('domain: %s, %d' % (domain, domain_num))
+    print('domain: %s, %d, class num %d' % (domain, domain_num, len(train_dataset.classes)))
     global best_accuracy
     global best_accuracies_each_c
     global best_mean_val_accuracies
