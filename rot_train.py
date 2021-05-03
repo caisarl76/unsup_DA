@@ -36,6 +36,7 @@ def parse_args(args=None, namespace=None):
     parser.add_argument('--save-dir', help='directory to save models', default='ssl_result/0315_3/', type=str)
 
     parser.add_argument('--model-name', default='resnet50dsbn', type=str)
+    parser.add_argument('--model-path', type=str)
     parser.add_argument('--domain', help='target training dataset', default='clipart')
 
     parser.add_argument('--num-workers', help='number of worker to load data', default=5, type=int)
