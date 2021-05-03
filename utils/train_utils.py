@@ -44,6 +44,7 @@ def test(args, model, val_dataset, domain_num):
     val_acc_each_c = [(c_name, float(eval_utils.accuracy_of_c(pred_ys, y_vals,
                                                               class_idx=c, topk=(1,))[0]))
                       for c, c_name in enumerate(val_dataset.classes)]
+    model.train(True)
     return model, val_acc
 
 
@@ -97,6 +98,7 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
             _, (x_s, y_s) = train_dataloader_iters.__next__()
 
         optimizer.zero_grad()
+        # model.train(True)
 
         x_s, y_s = x_s.cuda(args.gpu), y_s.cuda(args.gpu)
         domain_idx = torch.ones(x_s.shape[0], dtype=torch.long).cuda(args.gpu)
@@ -142,7 +144,6 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
             model = model.cuda(args.gpu)
 
     model, acc = test(args, model, val_dataset, domain_num)
-    model.train(True)
     model = model.cuda(args.gpu)
     print('final acc: %0.3f' % (acc))
 
