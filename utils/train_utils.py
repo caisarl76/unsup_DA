@@ -121,9 +121,9 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
                 best_accuracy = acc
                 model_dict = {'model': model.cpu().state_dict()}
                 optimizer_dict = {'optimizer': optimizer.state_dict()}
-
                 # save best checkpoint
                 io_utils.save_check(save_dir, i, model_dict, optimizer_dict, best=True)
+
             if (i % 2000 == 0 and i != 0):
                 if test_datset:
                     _, test_acc = test(args, model, test_datset, test_domain_num)

@@ -151,8 +151,8 @@ def main():
         if not os.path.isdir(save_dir):
             os.makedirs(save_dir, exist_ok=True)
 
-        model = normal_train(args, model, src_train, src_val, args.iters[1], save_dir, args.src_domain, trg_sup_val,
-                             args.trg_domain)
+        model = normal_train(args, model, src_train, src_val, args.iters[1], save_dir, args.src_domain,
+                             test_datset=trg_sup_val, test_domain=args.trg_domain)
 
     #################################### STAGE 3 ####################################
 

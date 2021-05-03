@@ -29,7 +29,7 @@ class_dict = {'officehome': 65, 'domainnet': 345}
 def parse_args(args=None, namespace=None):
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', help='directory where dataset exists',
-                        default='domainnet', type=str)
+                        default='officehome', type=str)
     parser.add_argument('--data-root', help='directory where dataset exists',
                         default='/data/', type=str)
     parser.add_argument('--save-root', help='directory to save models', type=str)
@@ -40,7 +40,7 @@ def parse_args(args=None, namespace=None):
 
     parser.add_argument('--num-workers', help='number of worker to load data', default=5, type=int)
     parser.add_argument('--batch-size', help='batch_size', default=100, type=int)
-    parser.add_argument("--iters", type=int, default=[70000, 30000], help="choose gpu device.", nargs='+')
+    parser.add_argument("--iters", type=int, default=[30000, 10000], help="choose gpu device.", nargs='+')
     parser.add_argument("--gpu", type=int, default=0, help="choose gpu device.")
 
     parser.add_argument('--learning-rate', '-lr', dest='learning_rate', help='learning_rate', default=1e-3, type=float)
@@ -83,8 +83,8 @@ def main():
 
         model = load_model(args.model_name, in_features=256, num_classes=4, num_domains=num_domain, pretrained=True)
         # model = get_rot_model(args.model_name, num_domains=6)
-        model = normal_train(args, model, train_dataset, val_dataset, args.iters[0], save_dir, args.domain,
-                             save_model=True)
+        # model = normal_train(args, model, train_dataset, val_dataset, args.iters[0], save_dir, args.domain,
+        #                      save_model=True)
 
         stage += 1
 
@@ -93,41 +93,41 @@ def main():
         train_dataset, val_dataset = get_dataset(dataset=args.dataset, dataset_root=args.data_root, domain=args.domain,
                                                  ssl=False)
 
-        for i in range(4):
+        # for i in range(4):
+        #
+        #     iter = i * 20000 + 10000
+        #     # iter = i * 2 + 1
+        #     model_pth = join(save_dir, '%d_weight.ckpt' % (iter))
+        #     if(os.path.isfile(model_pth)):
+        #         pre = torch.load(model_pth)
+        #     else:
+        #         print('no weight exists: ', model_pth)
+        #         break
+        #     print('load weight: ', join(save_dir, '%d_weight.ckpt' % (iter)))
+        #     model = load_model(args.model_name, in_features=num_classes, num_classes=num_classes,
+        #                        num_domains=num_domain, pretrained=True)
+        #
+        #     new_pre = OrderedDict()
+        #     for key in pre.keys():
+        #         if 'fc' in key:
+        #             print(key)
+        #         else:
+        #             new_pre[key] = pre[key]
+        #
+        #     model.load_state_dict(new_pre, strict=False)
+        #
+        #     torch.nn.init.xavier_uniform_(model.fc1.weight)
+        #     torch.nn.init.xavier_uniform_(model.fc2.weight)
+        #     model.fc1.weight.requires_grad = True
+        #     model.fc2.weight.requires_grad = True
+        #
+        #     save_dir_iter = join(save_root, args.save_dir, 'stage2_%d' % (iter))
+        #     if not os.path.isdir(save_dir_iter):
+        #         os.makedirs(save_dir_iter, exist_ok=True)
+        #
+        #     model = normal_train(args, model, train_dataset, val_dataset, args.iters[1], save_dir_iter, args.domain)
 
-            iter = i * 20000 + 10000
-            # iter = i * 2 + 1
-            model_pth = join(save_dir, '%d_weight.ckpt' % (iter))
-            if(os.path.isfile(model_pth)):
-                pre = torch.load(model_pth)
-            else:
-                print('no weight exists: ', model_pth)
-                break
-            print('load weight: ', join(save_dir, '%d_weight.ckpt' % (iter)))
-            model = load_model(args.model_name, in_features=num_classes, num_classes=num_classes,
-                               num_domains=num_domain, pretrained=True)
-
-            new_pre = OrderedDict()
-            for key in pre.keys():
-                if 'fc' in key:
-                    print(key)
-                else:
-                    new_pre[key] = pre[key]
-
-            model.load_state_dict(new_pre, strict=False)
-
-            torch.nn.init.xavier_uniform_(model.fc1.weight)
-            torch.nn.init.xavier_uniform_(model.fc2.weight)
-            model.fc1.weight.requires_grad = True
-            model.fc2.weight.requires_grad = True
-
-            save_dir_iter = join(save_root, args.save_dir, 'stage2_%d' % (iter))
-            if not os.path.isdir(save_dir_iter):
-                os.makedirs(save_dir_iter, exist_ok=True)
-
-            model = normal_train(args, model, train_dataset, val_dataset, args.iters[1], save_dir_iter, args.domain)
-
-        pre = torch.load(join(save_dir, 'best_model.ckpt'))
+        pre = torch.load(args.model_path)
 
         model = load_model(args.model_name, in_features=num_classes, num_classes=num_classes, num_domains=num_domain,
                            pretrained=True)
