@@ -41,6 +41,7 @@ def parse_args(args=None, namespace=None):
     parser.add_argument('--weight-decay', help='weight decay', default=0.0, type=float)
 
     parser.add_argument("--ssl", action='store_true')
+    parser.add_argument("--only1", action='store_true')
     parser.add_argument("--stage", type=int, default=1)
 
     args = parser.parse_args(args=args, namespace=namespace)
@@ -105,7 +106,10 @@ def main():
                 model = normal_train(args, model, trg_sup_train, trg_sup_val, args.iters[0], save_dir, args.trg_domain)
             else:
                 print('find stage 1 model: ', save_dir)
-        stage += 1
+        if args.only1:
+            stage = 1
+        else:
+            stage += 1
 
     #################################### STAGE 2 ####################################
     if stage == 2:
