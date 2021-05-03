@@ -37,7 +37,7 @@ def parse_args(args=None, namespace=None):
 
     parser.add_argument('--model-name', default='resnet50dsbn', type=str)
     parser.add_argument('--model-path', type=str)
-    parser.add_argument('--domain', help='target training dataset', default='clipart')
+    parser.add_argument('--domain', help='target training dataset', default='Clipart')
 
     parser.add_argument('--num-workers', help='number of worker to load data', default=5, type=int)
     parser.add_argument('--batch-size', help='batch_size', default=100, type=int)
