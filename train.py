@@ -4,7 +4,7 @@ from os.path import join as join
 import torch
 from collections import OrderedDict
 from model.rot_resnetdsbn import get_rot_model
-from model.factory import get_model, load_model
+from model.factory import get_model
 from utils.train_utils import normal_train, test
 
 from dataset.get_dataset import get_dataset
@@ -125,7 +125,7 @@ def main():
             pre = torch.load(model_pth)
             save_dir = join(save_root, 'stage2/sup', args.save_dir)
 
-        model = load_model(args.model_name, in_features=num_classes, num_classes=num_classes,
+        model = get_model(args.model_name, in_features=num_classes, num_classes=num_classes,
                            num_domains=num_domain, pretrained=False)
         model.load_state_dict(pre, strict=False)
 

@@ -61,16 +61,16 @@ for model_name in ['lenet', 'lenetdsbn', 'alexnet', 'resnet18dsbn', 'resnet50', 
                                                                 in_features=in_features, num_domains=num_domains))
 
 
-def get_model(model_name, num_classes, in_features=0, num_domains=2, pretrained=False):
-    model_key = model_name
-    if model_key not in __sets:
-        raise KeyError(
-            'Unknown Model: {}, num_classes: {}, in_features: {}'.format(model_key, num_classes, in_features))
-    return __sets[model_key](num_classes=num_classes, in_features=in_features,
-                             pretrained=pretrained, num_domains=num_domains)
+# def get_model(model_name, num_classes, in_features=0, num_domains=2, pretrained=False):
+#     model_key = model_name
+#     if model_key not in __sets:
+#         raise KeyError(
+#             'Unknown Model: {}, num_classes: {}, in_features: {}'.format(model_key, num_classes, in_features))
+#     return __sets[model_key](num_classes=num_classes, in_features=in_features,
+#                              pretrained=pretrained, num_domains=num_domains)
 
 
-def load_model(model_name, num_classes, in_features, num_domains, pretrained=False):
+def get_model(model_name, num_classes, in_features, num_domains, pretrained=False):
     if model_name == 'resnet18dsbn':
         model = resnetdsbn.resnet18dsbn(pretrained=pretrained, num_classes=num_classes, in_features=in_features,
                                         num_domains=num_domains)
