@@ -20,7 +20,7 @@ domain_dict = {'officehome': {'RealWorld': 0, 'Art': 1, 'Clipart': 2, 'Product':
 def parse_args(args=None, namespace=None):
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', help='directory where dataset exists',
-                        default='domainnet', type=str)
+                        default='officehome', type=str)
     parser.add_argument('--data-root', help='directory where dataset exists',
                         default='/data/', type=str)
     parser.add_argument('--save-root', help='directory to save models', default='/results/result/rot_ssl/', type=str)
@@ -31,8 +31,8 @@ def parse_args(args=None, namespace=None):
     parser.add_argument('--src-domain', help='target training dataset', default='sketch')
 
     parser.add_argument('--num-workers', help='number of worker to load data', default=5, type=int)
-    parser.add_argument('--batch-size', help='batch_size', default=100, type=int)
-    parser.add_argument("--iters", type=int, default=[100005, 50005], help="choose gpu device.", nargs='+')
+    parser.add_argument('--batch-size', help='batch_size', default=40, type=int)
+    parser.add_argument("--iters", type=int, default=[30005, 10005], help="choose gpu device.", nargs='+')
     parser.add_argument("--gpu", type=int, default=0, help="choose gpu device.")
 
     parser.add_argument('--learning-rate', '-lr', dest='learning_rate', help='learning_rate', default=1e-3, type=float)
@@ -42,7 +42,6 @@ def parse_args(args=None, namespace=None):
 
     parser.add_argument("--ssl", action='store_true')
     parser.add_argument("--stage", type=int, default=1)
-    parser.add_argument("--proceed", help='proceed to next stage', action='store_true')
 
     args = parser.parse_args(args=args, namespace=namespace)
     return args
