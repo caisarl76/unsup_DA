@@ -92,6 +92,8 @@ def main():
                                                          ssl=True)
                 print('train stage 1')
                 model = normal_train(args, model, trg_ssl_train, trg_ssl_val, args.iters[0], save_dir, args.trg_domain)
+            else:
+                print('find stage 1 model: ', save_dir)
         else:
             save_dir = join(save_root, 'stage1/sup/', args.trg_domain)
             if not os.path.isfile(join(save_dir, 'best_model.ckpt')):
@@ -102,6 +104,8 @@ def main():
                                    num_domains=num_domain, pretrained=True)
 
                 model = normal_train(args, model, trg_sup_train, trg_sup_val, args.iters[0], save_dir, args.trg_domain)
+            else:
+                print('find stage 1 model: ', save_dir)
         stage += 1
 
     #################################### STAGE 2 ####################################
