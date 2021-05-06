@@ -15,7 +15,7 @@ def main():
                        pretrained=True)
     pre = torch.load(pth)['model']
     model.load_state_dict(pre)
-    print(model)
+    # print(model)
 
     model.load_state_dict(pre, strict=False)
 
@@ -29,7 +29,7 @@ def main():
             new_name = name.replace(trg_bn, src_bn)
             weight_dict[new_name] = p
         elif (src_bn in name):
-            print(name, p[0][0])
+            print(name)
             continue
         else:
             weight_dict[name] = p
