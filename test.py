@@ -8,7 +8,7 @@ import torch.nn as nn
 import numpy as np
 from torch.utils.tensorboard import SummaryWriter
 
-from model.factory import get_model, load_model
+from model.factory import get_model
 from dataset.factory import get_dataset
 from dataset.get_dataset import get_dataset
 from utils.train_utils import test
@@ -58,7 +58,7 @@ def main():
 
     trg_num = domain_dict[args.dataset][args.trg_domain]
 
-    model = load_model(args.model_name, in_features=num_classes, num_classes=num_classes,
+    model = get_model(args.model_name, in_features=num_classes, num_classes=num_classes,
                        num_domains=num_domain, pretrained=True)
     model.load_state_dict(torch.load(args.model_path)['model'])
 
