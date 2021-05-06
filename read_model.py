@@ -1,5 +1,5 @@
 from model.resnetdsbn import resnet50dsbn, resnet18dsbn
-from model.factory import load_model
+from model.factory import get_model
 import torch
 from torch import nn as nn
 from torch.nn import init
@@ -11,7 +11,7 @@ def main():
     src_bn = 'bns.' + (str)(0)
     trg_bn = 'bns.' + (str)(1)
 
-    model = load_model('resnet50dsbn', in_features=256, num_classes=4, num_domains=4,
+    model = get_model('resnet50dsbn', in_features=256, num_classes=4, num_domains=4,
                        pretrained=True)
     pre = torch.load(pth)['model']
     model.load_state_dict(pre)
