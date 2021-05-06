@@ -33,7 +33,7 @@ def main():
         else:
             weight_dict[name] = p
     model.load_state_dict(weight_dict, strict=False)
-    print(model['layer3.1.bn1.bns.0.weight'])
+    print(model.named_parameters('layer4.1.bn1.bns.0.weight'))
     for name, p in model.named_parameters():
         p.requires_grad = False
 
