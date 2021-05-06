@@ -7,7 +7,7 @@ from collections import OrderedDict
 
 
 def main():
-    pth = '/results/officehome/stage1/rot/Art/best_model.ckpt'
+    pth = '/media/hd/jihun/dsbn_result/new/rot_sup/p_c/stage2/best_model.ckpt'
     src_bn = 'bns.' + (str)(0)
     trg_bn = 'bns.' + (str)(1)
 

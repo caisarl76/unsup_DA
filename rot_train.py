@@ -10,7 +10,7 @@ import torch.nn as nn
 import numpy as np
 from torch.utils.tensorboard import SummaryWriter
 
-from model.factory import load_model
+
 from model.rot_resnetdsbn import get_rot_model
 from model.factory import get_model
 from utils.train_utils import get_optimizer_params, normal_train, test
@@ -83,7 +83,7 @@ def main():
         train_dataset, val_dataset = get_dataset(dataset=args.dataset, dataset_root=args.data_root, domain=args.domain,
                                                  ssl=True)
 
-        model = load_model(args.model_name, in_features=256, num_classes=4, num_domains=num_domain, pretrained=True)
+        model = get_model(args.model_name, in_features=256, num_classes=4, num_domains=num_domain, pretrained=True)
         # model = get_rot_model(args.model_name, num_domains=6)
         # model = normal_train(args, model, train_dataset, val_dataset, args.iters[0], save_dir, args.domain,
         #                      save_model=True)
@@ -106,7 +106,7 @@ def main():
         #         print('no weight exists: ', model_pth)
         #         break
         #     print('load weight: ', join(save_dir, '%d_weight.ckpt' % (iter)))
-        #     model = load_model(args.model_name, in_features=num_classes, num_classes=num_classes,
+        #     model = get_model(args.model_name, in_features=num_classes, num_classes=num_classes,
         #                        num_domains=num_domain, pretrained=True)
         #
         #     new_pre = OrderedDict()
@@ -131,7 +131,7 @@ def main():
 
         pre = torch.load(args.model_path)
 
-        model = load_model(args.model_name, in_features=num_classes, num_classes=num_classes, num_domains=num_domain,
+        model = get_model(args.model_name, in_features=num_classes, num_classes=num_classes, num_domains=num_domain,
                            pretrained=True)
 
         new_pre = OrderedDict()
