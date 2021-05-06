@@ -19,8 +19,8 @@ def get_dataset(dataset='officehome', dataset_root='/data', domain='RealWorld', 
     if (dataset == 'officehome'):
         if ssl:
             if type(domain)==list:
-                train_dataset = rot_dataset(data_pth, 1, domain, split='train')
-                val_dataset = rot_dataset(data_pth, 1, domain, split='val')
+                train_dataset = rot_dataset(data_pth, len(domain), domain, split='train')
+                val_dataset = rot_dataset(data_pth, len(domain), domain, split='val')
             else:
                 train_dataset = rot_dataset(data_pth, 1, [domain], split='train')
                 val_dataset = rot_dataset(data_pth, 1, [domain], split='val')
