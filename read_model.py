@@ -29,7 +29,7 @@ def main():
             new_name = name.replace(trg_bn, src_bn)
             weight_dict[new_name] = p
         elif (src_bn in name):
-            print(name, p)
+            print(name, p[0][0])
             continue
         else:
             weight_dict[name] = p
