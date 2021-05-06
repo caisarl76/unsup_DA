@@ -87,11 +87,13 @@ def main():
                     os.makedirs(save_dir, exist_ok=True)
                 model = get_model(args.model_name, in_features=256, num_classes=4, num_domains=num_domain,
                                    pretrained=True)
+                print(type(model))
                 trg_ssl_train, trg_ssl_val = get_dataset(dataset=args.dataset, dataset_root=args.data_root,
                                                          domain=args.trg_domain,
                                                          ssl=True)
                 print('train stage 1')
                 model = normal_train(args, model, trg_ssl_train, trg_ssl_val, args.iters[0], save_dir, args.trg_domain)
+                print(type(model))
             else:
                 print('find stage 1 model: ', save_dir)
         else:
@@ -102,15 +104,17 @@ def main():
                     os.makedirs(save_dir, exist_ok=True)
                 model = get_model(args.model_name, in_features=num_classes, num_classes=num_classes,
                                    num_domains=num_domain, pretrained=True)
+                print(type(model))
 
                 model = normal_train(args, model, trg_sup_train, trg_sup_val, args.iters[0], save_dir, args.trg_domain)
+                print(type(model))
             else:
                 print('find stage 1 model: ', save_dir)
         if args.only1:
             stage = 1
         else:
             stage += 1
-
+    print(type(model))
     #################################### STAGE 2 ####################################
     if stage == 2:
         print('train stage 2')
@@ -127,6 +131,7 @@ def main():
 
         model = get_model(args.model_name, in_features=num_classes, num_classes=num_classes,
                            num_domains=num_domain, pretrained=False)
+        print(type(model))
         model.load_state_dict(pre, strict=False)
 
         src_bn = 'bns.' + (str)(src_num)
@@ -143,7 +148,7 @@ def main():
             else:
                 weight_dict[name] = p
         model.load_state_dict(weight_dict, strict=False)
-
+        print(type(model))
         for name, p in model.named_parameters():
             p.requires_grad = False
 
@@ -157,9 +162,9 @@ def main():
 
         model = normal_train(args, model, src_train, src_val, args.iters[1], save_dir, args.src_domain,
                              test_datset=trg_sup_val, test_domain=args.trg_domain)
-
+        print(type(model))
     #################################### STAGE 3 ####################################
-
+    print(type(model))
     _, stage3_acc = test(args, model, trg_sup_val, domain_dict[args.dataset][args.trg_domain])
     print('####################################')
     print('### stage 3 at stage1 iter: %0.3f' % (stage3_acc))
