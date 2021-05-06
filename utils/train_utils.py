@@ -56,9 +56,11 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
     train_dataloader = util_data.DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True,
                                             num_workers=args.num_workers, drop_last=True, pin_memory=True)
     train_dataloader_iters = enumerate(train_dataloader)
-
+    print('21', type(model))
     model.train(True)
+    print('22', type(model))
     model = model.cuda(args.gpu)
+    print('23', type(model))
 
     params = get_optimizer_params(model, args.learning_rate, weight_decay=args.weight_decay,
                                   double_bias_lr=True, base_weight_factor=0.1)
@@ -145,9 +147,11 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
 
             model.train(True)
             model = model.cuda(args.gpu)
-
+    print('25', type(model))
     model, acc = test(args, model, val_dataset, domain_num)
+    print('26', type(model))
     model = model.cuda(args.gpu)
+    print('27', type(model))
 
     print('final acc: %0.3f' % (acc))
 
