@@ -129,19 +129,18 @@ def main():
         #
         #     model = normal_train(args, model, train_dataset, val_dataset, args.iters[1], save_dir_iter, args.domain)
 
-        pre = torch.load(args.model_path)
-
         model = get_model(args.model_name, in_features=num_classes, num_classes=num_classes, num_domains=num_domain,
-                           pretrained=True)
+                          pretrained=True)
 
-        new_pre = OrderedDict()
-        for key in pre.keys():
-            if 'fc' in key:
-                print(key)
-            else:
-                new_pre[key] = pre[key]
-
-        model.load_state_dict(new_pre, strict=False)
+        # pre = torch.load(args.model_path)
+        # new_pre = OrderedDict()
+        # for key in pre.keys():
+        #     if 'fc' in key:
+        #         print(key)
+        #     else:
+        #         new_pre[key] = pre[key]
+        #
+        # model.load_state_dict(new_pre, strict=False)
         if args.onlyfc:
             print('train only fc layer')
             for name, p in model.named_parameters():
