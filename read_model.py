@@ -34,8 +34,7 @@ def main():
         else:
             weight_dict[name] = p
     model.load_state_dict(weight_dict, strict=False)
-    print(model.layer4[0].bn1.bns[0].weight.requires_grad)
-    print(model.layer4[0].bn1.bns[1].weight.requires_grad)
+
     for name, p in model.named_parameters():
         p.requires_grad = False
 
@@ -43,6 +42,8 @@ def main():
     model.fc2.weight.requires_grad = True
     torch.nn.init.xavier_uniform_(model.fc1.weight)
     torch.nn.init.xavier_uniform_(model.fc2.weight)
+    print(model.layer4[0].bn1.bns[0].weight.requires_grad)
+    print(model.layer4[0].bn1.bns[1].weight.requires_grad)
 
 if __name__ == '__main__':
     main()
