@@ -141,8 +141,8 @@ def main():
 
         model.load_state_dict(new_pre, strict=False)
 
-        src_bn = 'bns.' + (str)(1)
-        trg_bn = 'bns.' + (str)(0)
+        src_bn = 'bns.' + (str)(0)
+        trg_bn = 'bns.' + (str)(1)
 
         weight_dict = OrderedDict()
         for name, p in model.named_parameters():
