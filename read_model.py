@@ -21,7 +21,7 @@ def main():
 
     src_bn = 'bns.' + (str)(0)
     trg_bn = 'bns.' + (str)(1)
-    print(model['layer3.1.bn1.bns.0.weight'])
+    print(model.named_parameters('layer4.1.bn1.bns.0.weight'))
     weight_dict = OrderedDict()
     for name, p in model.named_parameters():
         if (trg_bn in name):
