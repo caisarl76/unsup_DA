@@ -7,7 +7,7 @@ from collections import OrderedDict
 
 
 def main():
-    pth = '/result/officehome/stage1/rot/RealWorld/best_model.ckpt'
+    pth = '/results/officehome/stage1/rot/Art/best_model.ckpt'
     src_bn = 'bns.' + (str)(0)
     trg_bn = 'bns.' + (str)(1)
 
@@ -29,6 +29,7 @@ def main():
             new_name = name.replace(trg_bn, src_bn)
             weight_dict[new_name] = p
         elif (src_bn in name):
+            print(name, p)
             continue
         else:
             weight_dict[name] = p
