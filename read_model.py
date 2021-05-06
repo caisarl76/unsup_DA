@@ -18,11 +18,11 @@ def main():
     print(model)
 
     model.load_state_dict(pre, strict=False)
-
+    print(len(model.parameters()))
+    print(len(model.named_parameters()))
     src_bn = 'bns.' + (str)(0)
     trg_bn = 'bns.' + (str)(1)
-    print(model.layer4[0].bn1.bns[0].weight.requires_grad)
-    print(model.layer4[0].bn1.bns[1].weight.requires_grad)
+
     weight_dict = OrderedDict()
     for name, p in model.named_parameters():
         if (trg_bn in name):
@@ -42,8 +42,6 @@ def main():
     model.fc2.weight.requires_grad = True
     torch.nn.init.xavier_uniform_(model.fc1.weight)
     torch.nn.init.xavier_uniform_(model.fc2.weight)
-    print(model.layer4[0].bn1.bns[0].weight.requires_grad)
-    print(model.layer4[0].bn1.bns[1].weight.requires_grad)
 
 if __name__ == '__main__':
     main()
