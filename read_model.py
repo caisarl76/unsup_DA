@@ -21,7 +21,7 @@ def main():
 
     src_bn = 'bns.' + (str)(0)
     trg_bn = 'bns.' + (str)(1)
-
+    print(model['layer3.1.bn1.bns.0.weight'])
     weight_dict = OrderedDict()
     for name, p in model.named_parameters():
         if (trg_bn in name):
@@ -29,11 +29,11 @@ def main():
             new_name = name.replace(trg_bn, src_bn)
             weight_dict[new_name] = p
         elif (src_bn in name):
-            print(name)
             continue
         else:
             weight_dict[name] = p
     model.load_state_dict(weight_dict, strict=False)
+    print(model['layer3.1.bn1.bns.0.weight'])
     for name, p in model.named_parameters():
         p.requires_grad = False
 
