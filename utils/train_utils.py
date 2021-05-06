@@ -131,7 +131,7 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
                 if test_datset:
                     model.train(True)
                     model = model.cuda(args.gpu)
-                    _, test_acc = test(args, model, test_datset, test_domain_num)
+                    model, test_acc = test(args, model, test_datset, test_domain_num)
                     print('%d iter accuracy: src: %0.3f || trg: %0.3f' % (i, acc * 100, test_acc * 100))
                 else:
                     print('%d iter accuracy: %0.3f' % (i, acc))
@@ -148,6 +148,7 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
 
     model, acc = test(args, model, val_dataset, domain_num)
     model = model.cuda(args.gpu)
+
     print('final acc: %0.3f' % (acc))
 
     writer.flush()
