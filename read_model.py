@@ -16,35 +16,30 @@ def main():
     pre = torch.load(pth)['model']
     model.load_state_dict(pre)
     print(model)
-    # print(model)
-    # new_pre = OrderedDict()
-    # for key in pre.keys():
-    #     if 'fc' in key:
-    #         print(key)
-    #     else:
-    #         new_pre[key] = pre[key]
-    #
-    # model.load_state_dict(new_pre, strict=False)
-    # for name, p in model.named_parameters():
-    #     print(name)
+
+    model.load_state_dict(pre, strict=False)
+
+    src_bn = 'bns.' + (str)(0)
+    trg_bn = 'bns.' + (str)(1)
 
     weight_dict = OrderedDict()
+    for name, p in model.named_parameters():
+        if (trg_bn in name):
+            weight_dict[name] = p
+            new_name = name.replace(trg_bn, src_bn)
+            weight_dict[new_name] = p
+        elif (src_bn in name):
+            continue
+        else:
+            weight_dict[name] = p
+    model.load_state_dict(weight_dict, strict=False)
+    for name, p in model.named_parameters():
+        p.requires_grad = False
 
-    # for name, p in model.named_parameters():
-    #     if name == 'layer4.0.bn1.bns.1.bias':
-    #         print(p)
-    #
-    # for name, p in model.named_parameters():
-    #     if (src_bn in name):
-    #         print(name)
-    #         new_name = name.replace(src_bn, trg_bn)
-    #         print(new_name)
-    #
-    #         weight_dict[new_name] = p
-    #
-    # model.load_state_dict(weight_dict, strict=False)
-
-
+    model.fc1.weight.requires_grad = True
+    model.fc2.weight.requires_grad = True
+    torch.nn.init.xavier_uniform_(model.fc1.weight)
+    torch.nn.init.xavier_uniform_(model.fc2.weight)
 
 if __name__ == '__main__':
     main()
