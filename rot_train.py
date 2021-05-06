@@ -1,16 +1,9 @@
 import argparse
 from collections import OrderedDict
-import torch.nn.functional as F
-import torch.optim as optim
 import os
 from os.path import join as join
 import torch
-from torch.utils import data as util_data
-import torch.nn as nn
-import numpy as np
-from torch.utils.tensorboard import SummaryWriter
 
-from model.rot_resnetdsbn import get_rot_model
 from model.factory import get_model
 from utils.train_utils import get_optimizer_params, normal_train, test
 

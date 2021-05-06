@@ -1,4 +1,5 @@
 import argparse
+import sys
 import os
 from os.path import join as join
 import torch
@@ -79,6 +80,7 @@ def main():
 
     #################################### STAGE 1 ####################################
     if stage == 1:
+
         if args.ssl:
             save_dir = join(save_root, 'stage1/rot/', args.trg_domain)
             if not os.path.isfile(join(save_dir, 'best_model.ckpt')):
@@ -86,7 +88,7 @@ def main():
                 if not os.path.isdir(save_dir):
                     os.makedirs(save_dir, exist_ok=True)
                 model = get_model(args.model_name, in_features=256, num_classes=4, num_domains=num_domain,
-                                  pretrained=True)
+                                  pretrained=False)
                 trg_ssl_train, trg_ssl_val = get_dataset(dataset=args.dataset, dataset_root=args.data_root,
                                                          domain=args.trg_domain,
                                                          # domain=[args.trg_domain, args.src_domain],
@@ -103,7 +105,7 @@ def main():
                 if not os.path.isdir(save_dir):
                     os.makedirs(save_dir, exist_ok=True)
                 model = get_model(args.model_name, in_features=num_classes, num_classes=num_classes,
-                                  num_domains=num_domain, pretrained=True)
+                                  num_domains=num_domain, pretrained=False)
 
                 model = normal_train(args, model, trg_sup_train, trg_sup_val, args.iters[0], save_dir, args.trg_domain)
             else:
@@ -121,12 +123,14 @@ def main():
             print('load model from %s' % (model_pth))
             pre = torch.load(model_pth)
             save_dir = join(save_root, 'stage2/rot', args.save_dir)
+
         else:
             model_pth = join(save_root, 'stage1/sup/', args.trg_domain, 'best_model.ckpt')
             print('load model from %s' % (model_pth))
             pre = torch.load(model_pth)
             save_dir = join(save_root, 'stage2/sup', args.save_dir)
 
+        # sys.stdout = open(join(save_dir, 'logs.txt'), 'w')
         model = get_model(args.model_name, in_features=num_classes, num_classes=num_classes,
                           num_domains=num_domain, pretrained=False)
         model.load_state_dict(pre, strict=False)
@@ -161,8 +165,10 @@ def main():
     #################################### STAGE 3 ####################################
     _, stage3_acc = test(args, model, trg_sup_val, domain_dict[args.dataset][args.trg_domain])
     print('####################################')
-    print('### stage 3 at stage1 iter: %0.3f' % (stage3_acc))
+    print('### stage 3 at stage1 iter: %0.3f' % (stage3_acc * 100))
     print('####################################')
+
+    # sys.stdout.close()
 
 
 if __name__ == '__main__':
