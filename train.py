@@ -88,7 +88,7 @@ def main():
                 model = get_model(args.model_name, in_features=256, num_classes=4, num_domains=num_domain,
                                   pretrained=True)
                 trg_ssl_train, trg_ssl_val = get_dataset(dataset=args.dataset, dataset_root=args.data_root,
-                                                         domain=args.trg_domain,
+                                                         domain=[args.trg_domain, args.src_domain],
                                                          ssl=True)
                 print('train stage 1')
                 model = normal_train(args, model, trg_ssl_train, trg_ssl_val, args.iters[0], save_dir, args.trg_domain)

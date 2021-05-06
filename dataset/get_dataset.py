@@ -18,8 +18,12 @@ def get_dataset(dataset='officehome', dataset_root='/data', domain='RealWorld', 
     data_pth = join(dataset_root, data_pth_dict[dataset])
     if (dataset == 'officehome'):
         if ssl:
-            train_dataset = rot_dataset(data_pth, 1, [domain], split='train')
-            val_dataset = rot_dataset(data_pth, 1, [domain], split='val')
+            if type(domain)==list:
+                train_dataset = rot_dataset(data_pth, 1, domain, split='train')
+                val_dataset = rot_dataset(data_pth, 1, domain, split='val')
+            else:
+                train_dataset = rot_dataset(data_pth, 1, [domain], split='train')
+                val_dataset = rot_dataset(data_pth, 1, [domain], split='val')
         else:
             train_dataset = OFFICEHOME_multi(data_pth, 1, [domain], split='train')
             val_dataset = OFFICEHOME_multi(data_pth, 1, [domain], split='val')
