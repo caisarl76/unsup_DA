@@ -21,8 +21,8 @@ def main():
 
     src_bn = 'bns.' + (str)(0)
     trg_bn = 'bns.' + (str)(1)
-    print(model.layer4[0].bn1.bns[0].weight[:3])
-    print(model.layer4[0].bn1.bns[1].weight[:3])
+    print(model.layer4[0].bn1.bns[0].weight.requires_grad)
+    print(model.layer4[0].bn1.bns[1].weight.requires_grad)
     weight_dict = OrderedDict()
     for name, p in model.named_parameters():
         if (trg_bn in name):
@@ -34,8 +34,8 @@ def main():
         else:
             weight_dict[name] = p
     model.load_state_dict(weight_dict, strict=False)
-    print(model.layer4[0].bn1.bns[0].weight[:3])
-    print(model.layer4[0].bn1.bns[1].weight[:3])
+    print(model.layer4[0].bn1.bns[0].weight.requires_grad)
+    print(model.layer4[0].bn1.bns[1].weight.requires_grad)
     for name, p in model.named_parameters():
         p.requires_grad = False
 
