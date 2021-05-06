@@ -75,7 +75,7 @@ def main():
         train_dataset, val_dataset = get_dataset(dataset=args.dataset, dataset_root=args.data_root, domain=args.domain,
                                                  ssl=True)
 
-        model = get_model(args.model_name, in_features=256, num_classes=4, num_domains=num_domain, pretrained=True)
+        model = get_model(args.model_name, in_features=256, num_classes=4, num_domains=num_domain, pretrained=False)
         # model = get_rot_model(args.model_name, num_domains=6)
         # model = normal_train(args, model, train_dataset, val_dataset, args.iters[0], save_dir, args.domain,
         #                      save_model=True)
@@ -122,7 +122,7 @@ def main():
         #     model = normal_train(args, model, train_dataset, val_dataset, args.iters[1], save_dir_iter, args.domain)
 
         model = get_model(args.model_name, in_features=num_classes, num_classes=num_classes, num_domains=num_domain,
-                          pretrained=True)
+                          pretrained=False)
 
         # pre = torch.load(args.model_path)
         # new_pre = OrderedDict()
