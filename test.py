@@ -24,7 +24,7 @@ domain_dict = {'officehome': {'RealWorld': 0, 'Art': 1, 'Clipart': 2, 'Product':
 def parse_args(args=None, namespace=None):
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', help='directory where dataset exists',
-                        default='domainnet', type=str)
+                        default='officehome', type=str)
     parser.add_argument('--data-root', help='directory where dataset exists',
                         default='/data/', type=str)
     parser.add_argument('--model-path', help='directory to save models', default='result/try1/best_model.ckpt',
