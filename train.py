@@ -150,7 +150,10 @@ def main():
                 weight_dict[name] = p
         model.load_state_dict(weight_dict, strict=False)
         for name, p in model.named_parameters():
-            p.requires_grad = False
+            if 'fc' in name:
+                p.requires_grad = True
+            else:
+               p.requires_grad = False
 
         model.fc1.weight.requires_grad = True
         model.fc1.bias.requires_grad = True
