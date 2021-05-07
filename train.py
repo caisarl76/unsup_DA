@@ -160,9 +160,8 @@ def main():
         model.fc2.weight.requires_grad = True
         model.fc1.bias.requires_grad = True
         torch.nn.init.xavier_uniform_(model.fc1.weight)
-        torch.nn.init.xavier_uniform_(model.fc1.bias)
         torch.nn.init.xavier_uniform_(model.fc2.weight)
-        torch.nn.init.xavier_uniform_(model.fc2.bias)
+
 
         if not os.path.isdir(save_dir):
             os.makedirs(save_dir, exist_ok=True)
