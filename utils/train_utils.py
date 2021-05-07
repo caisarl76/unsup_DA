@@ -55,6 +55,7 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
     train_dataloader = util_data.DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True,
                                             num_workers=args.num_workers, drop_last=True, pin_memory=True)
     train_dataloader_iters = enumerate(train_dataloader)
+
     model.train(True)
     model = model.cuda(args.gpu)
 
@@ -105,14 +106,18 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
         loss = ce_loss(pred, y_s)
         # print(pred.shape, y_s.shape)
         writer.add_scalar("Train Loss", loss, i)
-        if not freeze:
-            loss.backward()
-            optimizer.step()
+        loss.backward()
+        optimizer.step()
+        lr_scheduler(optimizer, i)
 
-            if (args.lr_scheduler):
-                lr_scheduler.step()
-            else:
-                lr_scheduler(optimizer, i)
+        # if not freeze:
+        #     loss.backward()
+        #     optimizer.step()
+        #
+        #     if (args.lr_scheduler):
+        #         lr_scheduler.step()
+        #     else:
+        #         lr_scheduler(optimizer, i)
         # if (i % 1 == 0 and i != 0):
         if (i % 500 == 0 and i != 0):
             model, acc = test(args, model, val_dataset, domain_num)
