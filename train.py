@@ -153,7 +153,9 @@ def main():
             p.requires_grad = False
 
         model.fc1.weight.requires_grad = True
+        model.fc1.bias.requires_grad = True
         model.fc2.weight.requires_grad = True
+        model.fc1.bias.requires_grad = True
         torch.nn.init.xavier_uniform_(model.fc1.weight)
         torch.nn.init.xavier_uniform_(model.fc2.weight)
 
