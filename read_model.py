@@ -11,11 +11,30 @@ def main():
     src_bn = 'bns.' + (str)(0)
     trg_bn = 'bns.' + (str)(1)
 
-    model = get_model('resnet50dsbn', in_features=256, num_classes=4, num_domains=4,
+    model = get_model('resnet50dsbn', in_features=65, num_classes=65, num_domains=4,
                        pretrained=True)
     pre = torch.load(pth)['model']
-    model.load_state_dict(pre)
-    print(model)
+    # model.load_state_dict(pre)
+    # print(model)
+    model.eval()
+    before_forward = {
+        'running_mean': model.bn1.bns[0].running_mean.clone(),
+        'running_var': model.bn1.bns[0].running_var.clone(),
+        'weight': model.bn1.bns[0].weight.clone(),
+        'bias': model.bn1.bns[0].bias.clone(),
+    }
+    model(torch.randn([3, 3, 224, 224]), torch.zeros(3, dtype=torch.long))
+
+    print(torch.all(before_forward['running_mean'] == model.bn1.bns[0].running_mean))
+    print(torch.all(before_forward['running_var'] == model.bn1.bns[0].running_var))
+    print(torch.all(before_forward['weight'] == model.bn1.bns[0].weight))
+    print(torch.all(before_forward['bias'] == model.bn1.bns[0].bias))
+
+    for name, p in model.named_parameters():
+        print(name)
+    return
+
+
 
     model.load_state_dict(pre, strict=False)
     print(len(model.parameters()))

@@ -124,30 +124,30 @@ def main():
         model = get_model(args.model_name, in_features=num_classes, num_classes=num_classes, num_domains=num_domain,
                           pretrained=False)
 
-        # pre = torch.load(args.model_path)
-        # new_pre = OrderedDict()
-        # for key in pre.keys():
-        #     if 'fc' in key:
-        #         print(key)
-        #     else:
-        #         new_pre[key] = pre[key]
-        #
-        # model.load_state_dict(new_pre, strict=False)
-        #
-        # src_bn = 'bns.' + (str)(0)
-        # trg_bn = 'bns.' + (str)(1)
-        #
-        # weight_dict = OrderedDict()
-        # for name, p in model.named_parameters():
-        #     if (trg_bn in name):
-        #         weight_dict[name] = p
-        #         new_name = name.replace(trg_bn, src_bn)
-        #         weight_dict[new_name] = p
-        #     elif (src_bn in name):
-        #         continue
-        #     else:
-        #         weight_dict[name] = p
-        # model.load_state_dict(weight_dict, strict=False)
+        pre = torch.load(args.model_path)
+        new_pre = OrderedDict()
+        for key in pre.keys():
+            if 'fc' in key:
+                print(key)
+            else:
+                new_pre[key] = pre[key]
+
+        model.load_state_dict(new_pre, strict=False)
+
+        src_bn = 'bns.' + (str)(0)
+        trg_bn = 'bns.' + (str)(1)
+
+        weight_dict = OrderedDict()
+        for name, p in model.named_parameters():
+            if (trg_bn in name):
+                weight_dict[name] = p
+                new_name = name.replace(trg_bn, src_bn)
+                weight_dict[new_name] = p
+            elif (src_bn in name):
+                continue
+            else:
+                weight_dict[name] = p
+        model.load_state_dict(weight_dict, strict=False)
         for name, p in model.named_parameters():
             p.requires_grad = False
 

@@ -38,7 +38,6 @@ def test(args, model, val_dataset, domain_num):
             pred_y = model(x_val, domain_num * torch.ones_like(y_val), with_ft=False)
             pred_ys.append(pred_y.cpu())
 
-
     pred_ys = torch.cat(pred_ys, 0)
     y_vals = torch.cat(y_vals, 0)
     val_acc = float(eval_utils.accuracy(pred_ys, y_vals, topk=(1,))[0])
@@ -131,7 +130,7 @@ def normal_train(args, model, train_dataset, val_dataset, iter, save_dir, domain
                     model.train(True)
                     model = model.cuda(args.gpu)
                     model, test_acc = test(args, model, test_datset, test_domain_num)
-                    print('%d iter accuracy: src: %0.3f || trg: %0.3f' % (i, acc * 100, test_acc * 100))
+                    print('%d iter accuracy: src: %0.3f || trg: %0.3f' % (i, acc, test_acc))
                 else:
                     print('%d iter accuracy: %0.3f' % (i, acc))
             if (i % 20000 == 10000 and i != 0):
