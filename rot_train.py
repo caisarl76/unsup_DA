@@ -124,15 +124,15 @@ def main():
         model = get_model(args.model_name, in_features=num_classes, num_classes=num_classes, num_domains=num_domain,
                           pretrained=False)
 
-        pre = torch.load(args.model_path)
-        new_pre = OrderedDict()
-        for key in pre.keys():
-            if 'fc' in key:
-                print(key)
-            else:
-                new_pre[key] = pre[key]
-
-        model.load_state_dict(new_pre, strict=False)
+        # pre = torch.load(args.model_path)
+        # new_pre = OrderedDict()
+        # for key in pre.keys():
+        #     if 'fc' in key:
+        #         print(key)
+        #     else:
+        #         new_pre[key] = pre[key]
+        #
+        # model.load_state_dict(new_pre, strict=False)
 
         src_bn = 'bns.' + (str)(0)
         trg_bn = 'bns.' + (str)(1)
